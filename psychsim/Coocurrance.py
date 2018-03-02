@@ -61,13 +61,10 @@ class GAMWorldStateInitializer:
                 else:
                     weight = self.DEFAULT_ACTION_WEIGHT
 
-                tree_label = agent.name + "distribution for " + state
-
                 action = agent.addAction({'verb': action_name})
-                print action
 
                 # why is it 'subject'? should it not be 'object'?
-                tree = makeTree({tree_label: [
+                tree = makeTree({'distribution': [
                     (incrementMatrix(stateKey(action['subject'], state), weight), variables['probIncrease']),
                     (incrementMatrix(stateKey(action['subject'], state), weight), variables['probDecrease'])
                     ]})
@@ -133,14 +130,14 @@ gwsi.setTerminationCondition("economy", 200)  # OR economy doubles
 gwsi.setRewardCondition("max", "welfare")
 gwsi.setRewardCondition("min", "tension")
 
-# while not world.terminated():
-#     result = world.step()
-#     world.explain(result, 1)
-#     world.explain(result, 2)
-#     world.explain(result, 3)
-#     world.explain(result, 4)
-#     world.explain(result, 5)
-#     step = step + 1
+while not world.terminated():
+    result = world.step()
+    world.explain(result, 1)
+    world.explain(result, 2)
+    world.explain(result, 3)
+    world.explain(result, 4)
+    world.explain(result, 5)
+    step = step + 1
 
 
 # How to encode the following "Reward Functions"?
