@@ -74,6 +74,26 @@ class GAMWorldStateInitializer:
 
                 self.world.setDynamics(stateKey(action['subject'], state), action, tree)
 
+    # Currently applies termination condition to all agents
+    def setTerminationCondition(self, goal_state, end_value):
+        # Any of the "positive" state variables turns to 0
+        for a in self.agents:
+            tree = makeTree({'if': equalRow(stateKey(a.name, goal_state), end_value),
+                             True: True, False: False})
+            self.world.addTermination(tree)
+
+    # Currently set same reward for all agents
+    def setRewardCondition(self, rewardType, reward_state1, reward_state2=None):
+        for a in self.agents:
+            if rewardType == "max":
+                a.setReward(maximizeFeature(reward_state1))
+            elif rewardType == "min":
+                a.setReward(minimizeFeature(reward_state1))
+            elif rewardType == "minDifference" and reward_state2 is not None:
+                a.setReward(minimizeDifference(reward_state1, reward_state2))
+            else:
+                print "Cannot set reward condition"
+
 
 # Read In Coocurrance file
 cooc = pd.read_csv("CooccuranceOutput2013.csv")
@@ -104,10 +124,16 @@ gwsi.createActions(pos_vars_weights=pos_vars_weights, neg_vars_weights=neg_vars_
 # Run Simulation for X number of steps
 print "Start Simulation"
 world.setOrder(world.agents.keys())
-X = 5
-step = 0
-print world.getDynamics()
-# while step < X:
+
+# Set Termination Conditions
+gwsi.setTerminationCondition("economy", 0)  # economy tanks
+gwsi.setTerminationCondition("economy", 200)  # OR economy doubles
+
+# Set Rewards
+gwsi.setRewardCondition("max", "welfare")
+gwsi.setRewardCondition("min", "tension")
+
+# while not world.terminated():
 #     result = world.step()
 #     world.explain(result, 1)
 #     world.explain(result, 2)
