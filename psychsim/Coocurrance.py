@@ -9,7 +9,7 @@ import pandas as pd
 
 class GAMWorldStateInitializer:
     def __init__(self, Coocurrances, World, agents):
-        self.DEFAULT_ACTION_WEIGHT = 1
+        self.DEFAULT_ACTION_WEIGHT = 1.
         self.DEFAULT_STATE_VALUE = 100
 
         self.cooc = Coocurrances
@@ -63,7 +63,6 @@ class GAMWorldStateInitializer:
 
                 action = agent.addAction({'verb': action_name})
 
-                # why is it 'subject'? should it not be 'object'?
                 tree = makeTree({'distribution': [
                     (incrementMatrix(stateKey(action['subject'], state), weight), variables['probIncrease']),
                     (incrementMatrix(stateKey(action['subject'], state), weight), variables['probDecrease'])
@@ -127,6 +126,7 @@ gwsi.setTerminationCondition("economy", 0)  # economy tanks
 gwsi.setTerminationCondition("economy", 200)  # OR economy doubles
 
 # Set Rewards
+gwsi.setRewardCondition("max", "economy")
 gwsi.setRewardCondition("max", "welfare")
 gwsi.setRewardCondition("min", "tension")
 
@@ -137,7 +137,6 @@ while not world.terminated():
     world.explain(result, 3)
     world.explain(result, 4)
     world.explain(result, 5)
-    step = step + 1
 
 
 # How to encode the following "Reward Functions"?
