@@ -34,25 +34,34 @@ class TreeBuilder:
         '''
         if self.config == 'file':
             pass
-        
-            
                     
-    def get_sentence_from_file(self):
+    def get_sentence_from_file(self, file_obj):
         '''
         Generate each sentence as a list of lines.
         '''
-        with open(self.filename) as f:
-            count = 0
-            buf = []
-            for _, line in enumerate(f):
-                if '\t' not in line:
-                    count += 1
-                    yield buf
-                    buf = []
-                else:
-                    buf.append(line)
-            if buf:
+        count = 0
+        buf = []
+        for _, line in enumerate(file_obj):
+            if '\t' not in line:
+                count += 1
                 yield buf
+                buf = []
+            else:
+                buf.append(line)
+        if buf:
+            yield buf
+                
+    def get_ith_sentence_from_file(self, file_obj, i):
+        '''
+        Generate ith sentence as a list of lines.
+        '''
+        cnt = 1 # sentence count starts from 1
+        for sen in self.get_sentence_from_file(file_obj):
+            if cnt == i:
+                return sen
+            cnt += 1
+        # Exception handling, index out of bound.
+        return []
     
     def build_tree(self, sentence):
         '''
