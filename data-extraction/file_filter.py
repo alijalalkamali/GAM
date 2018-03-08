@@ -131,6 +131,7 @@ def parse_id():
 
         for part_id in os.listdir(reproduce_output_dir):
             for filename in os.listdir(reproduce_output_dir + '/' + part_id):
+                sen_id = 0
                 file_path = '{}/{}/{}'.format(reproduce_output_dir, part_id, filename)
                 with open(file_path, 'r') as f:
                     for line in f:
