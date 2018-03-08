@@ -11,7 +11,7 @@ class SrlProcessor:
         self.stative_path = 'data/params/stativewords.txt'
         self.stative_verb_list = self.file_loader(self.stative_path)
         self.actor_path = 'data/params/country_nationality.txt'
-        self.actor_list = self.get_country_list(self.actor_path).keys()
+        self.actor_list = self.get_country_list(self.actor_path)
         
         # self.states_path = 'params/states.txt'
         # self.base_forms = self.file_loader(self.states_path)
@@ -39,25 +39,6 @@ class SrlProcessor:
             return ret
         return None
 
-    # def find_coref(self, corenlp_filename, possesive_pronoun_node):
-    #     f = open(corenlp_filename, 'rb')
-    #     xml_string = f.read()
-    #     f.close()
-    #     doc = Document(xml_string)
-
-    #     possesive_pronoun_id = possesive_pronoun_node.label['id']
-
-    #     for coref in doc.coreferences:
-    #         for mention in coref.mentions:
-    #             _sen_id = mention.sentence.id
-    #             _w_id = mention.head.id
-    #             if sen_id == _sen_id and _w_id == possesive_pronoun_id:
-    #                 for _mention in coref.mentions:
-    #                     if _mention.text in self.actor_list:
-    #                         return [self.actor_list[_mention.text]]
-
-
-    #     return []
     
     def process_sentence(self, filename, sen_id, w_id):
         '''
@@ -66,15 +47,15 @@ class SrlProcessor:
         :rtype: tuple(actors, action verb, state, stative verb)
         '''
         
-        srl_filename = '%s.txt.srl'%filename
-        corenlp_filename = '%s.xml'%filename
+        srl_filename = 'data/ClearnlpOutput/%s.txt.srl'%filename
+        corenlp_filename = 'data/CorenlpOutput/%s.xml'%filename
         # self.tb.filename = srl_filename
         if not os.path.isfile(srl_filename):
             print('%s file missing'%srl_filename)
             return
-        # if not os.path.isfile(corenlp_filename):
-        #     print('%s file missing'%corenlp_filename)
-        #     return
+        if not os.path.isfile(corenlp_filename):
+            print('%s file missing'%corenlp_filename)
+            return
         
         sen = self.tb.get_ith_sentence_from_file(srl_filename, sen_id)
 
@@ -104,17 +85,20 @@ class SrlProcessor:
                     print('stative verbs:%s'%str(stative_verbs))
                     
                     # Change find to direct children
-                    possesive_pronoun_node = state_node[0].find('deprel', 'poss')
+                    possesive_pronoun_nodes = state_node[0].find('deprel', 'poss')
                     # Not checking if actor is from state's subtree.
-                    actor_nodes = root_node.find_list('form', self.actor_list)
+                    actor_nodes = root_node.find_list('form', self.actor_list.keys())
                     actors = [n.label['form'] for n in actor_nodes]
-                    if not possesive_pronoun_node:
+                    if not possesive_pronoun_nodes:
                         print('no possesive pronoun found in %d'%sen_id)
                         # find actor directly.
                         
                         
                     else:
-                        # find actor through corenlp.
+                        print('possesive pronoun found in %d: %d, first is %s'%(
+                            sen_id,
+                            len(possesive_pronoun_nodes),
+                            possesive_pronoun_nodes[0]))
                         # find actor through corenlp.
                         actors = []
                         f = open(corenlp_filename, 'rb')
@@ -122,8 +106,8 @@ class SrlProcessor:
                         f.close()
                         doc = Document(xml_string)
 
-                        possesive_pronoun_id = possesive_pronoun_node.label['id']
-
+                        possesive_pronoun_id = possesive_pronoun_nodes[0].label['id']
+                        import pdb; pdb.set_trace()
                         for coref in doc.coreferences:
                             isFound = False
                             _actor = None
@@ -159,7 +143,7 @@ class SrlProcessor:
             for line in f:
                 filename, sen_id, w_id, word = tuple(line.strip().split(','))
                 # (TODO: Make unified directory resolution.)
-                filename = 'data/ClearnlpOutput/%s'%filename
+                filename = '%s'%filename
                 print('processing '+filename)
                 yield self.process_sentence(filename, int(sen_id), int(w_id))
         
@@ -192,7 +176,7 @@ def main():
     
     # (TODO: Iterate through the results.)
     for ans in sp.process_list('list.txt'):
-        pass
+        print(ans)
     
 if __name__ == '__main__':
     main()
