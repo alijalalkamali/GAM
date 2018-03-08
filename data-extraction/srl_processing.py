@@ -10,14 +10,24 @@ class SrlProcessor:
     def __init__(self):
         self.stative_path = 'data/params/stativewords.txt'
         self.stative_verb_list = self.file_loader(self.stative_path)
-        self.actor_path = 'data/params/countr_map.txt'
-        self.actor_list = self.file_loader(self.actor_path)
+        self.actor_path = 'data/params/country_nationality.txt'
+        self.actor_list = self.get_country_list(self.actor_path).keys()
         
         # self.states_path = 'params/states.txt'
         # self.base_forms = self.file_loader(self.states_path)
                 
         self.tb = tree_builder.TreeBuilder()
         
+    def get_country_list(self, country_list_file):
+        country_list = {}
+        with open(country_list_file) as f:
+            for line in f:
+                line = line.strip().split('\t')
+                if len(line) > 0:
+                    _country = line[0]
+                    for country in line:
+                        country_list[country] = _country
+        return country_list
     
     def file_loader(self, filename, col=0):
         '''
@@ -29,13 +39,18 @@ class SrlProcessor:
             return ret
         return None
 
-    def process_sentence(self, file_obj, sen_id, w_id):
+    def process_sentence(self, filename, sen_id, w_id):
         '''
         :param 
-        :type file_obj: object, sen_id: int, w_id: int
+        :type filename: string, sen_id: int, w_id: int
         :rtype: tuple(actors, action verb, state, stative verb)
         '''
-        sen = self.tb.get_ith_sentence_from_file(file_obj, sen_id)
+        
+        srl_filename = '%s.txt.srl'%filename
+        coref_filename = '%s.xml'%filename
+        # self.tb.filename = srl_filename
+        
+        sen = self.tb.get_ith_sentence_from_file(srl_filename, sen_id)
 
         root_nodes = self.tb.build_tree(sen)
         # In case there are multiple roots.
@@ -47,11 +62,12 @@ class SrlProcessor:
                     sen_id, root_node.label['form']))
                 # Continue to find the id in next root node.
             else:
-                state = state_node.label['form']
+                state = state_node[0].label['form']
                 print('state:%s'%str(state))
                 
                 # lemma here instead of form
-                stative_verb_nodes = root_node.find_list('lemma', self.stative_verb_list) 
+                stative_verb_nodes = root_node.find_list(
+                    'lemma', self.stative_verb_list) 
                 # import pdb; pdb.set_trace()
                 if not stative_verb_nodes:
                     print('no stative verb found in %d'%sen_id)
@@ -59,7 +75,9 @@ class SrlProcessor:
                     stative_verbs = [n.label['form'] for n in stative_verb_nodes]
                     print('stative verbs:%s'%str(stative_verbs))
                     
+                    # Change find to direct children
                     possesive_pronoun_node = state_node.find('deprel', 'poss')
+                    # Not checking if actor is from state's subtree.
                     actor_nodes = root_node.find_list('form', self.actor_list)
                     actors = [n.label['form'] for n in actor_nodes]
                     if not possesive_pronoun_node:
@@ -77,26 +95,20 @@ class SrlProcessor:
                     return (actors, action_verb, state, stative_verbs)
 
 
-    def process_file(self, filename, state_list):
+    def process_list(self, list_filename):
         '''
-        :type filename: string, state_list: list(tuple)
+        :type filename: string
         :rtype list(tuple)
         '''
-        
-        srl_filename = '%s.txt.srl'%filename
-        coref_filename = '%s.xml'%filename
-        
-        if not os.path.isfile(srl_filename) or not os.path.isfile(coref_filename):
+        if not os.path.isfile(list_filename):
             print('%s file missing'%'filename')
             return
         
-        # process single file
+        with open(list_filename) as f:
+            for line in f:
+                filename, sen_id, w_id, word = tuple(line.strip().split(','))
+                yield self.process_sentence(filename, int(sen_id), int(w_id))
         
-        self.tb.filename = srl_filename
-        
-        with open(filename) as file_obj:
-            for state in state_list:
-                yield self.process_sentence(file_obj, state[0], state[1])
 
 def main():
     '''
@@ -128,7 +140,8 @@ def main():
     
     # Iterating through newsTexts
     for i in range(1, 2):
-        sp.process_file('data/20140519/Part1/newsText%d'%i, state_list)
+        # (TODO: Iterate through the results.)
+        sp.process_list('list.txt')
     
 if __name__ == '__main__':
     main()

@@ -52,7 +52,6 @@ class Node(object):
         the given values.
         '''
         ret = []
-        # import pdb; pdb.set_trace()
         if self.label.get(field) in value_list:
             ret.append(self)
         for child in self.children:
