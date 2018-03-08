@@ -4,7 +4,7 @@ Basic implementation of SRL processing tasks discussed on Feb 16.
 
 import tree_builder
 import os.path
-# from corenlp_xml.document import Document
+from corenlp_xml.document import Document
 
 class SrlProcessor:
     def __init__(self):
@@ -67,13 +67,13 @@ class SrlProcessor:
         '''
         
         srl_filename = '%s.txt.srl'%filename
-        coref_filename = '%s.xml'%filename
+        corenlp_filename = '%s.xml'%filename
         # self.tb.filename = srl_filename
         if not os.path.isfile(srl_filename):
             print('%s file missing'%srl_filename)
             return
-        # if not os.path.isfile(coref_filename):
-        #     print('%s file missing'%coref_filename)
+        # if not os.path.isfile(corenlp_filename):
+        #     print('%s file missing'%corenlp_filename)
         #     return
         
         sen = self.tb.get_ith_sentence_from_file(srl_filename, sen_id)
@@ -115,7 +115,28 @@ class SrlProcessor:
                         
                     else:
                         # find actor through corenlp.
-                        pass
+                        # find actor through corenlp.
+                        actors = []
+                        f = open(corenlp_filename, 'rb')
+                        xml_string = f.read()
+                        f.close()
+                        doc = Document(xml_string)
+
+                        possesive_pronoun_id = possesive_pronoun_node.label['id']
+
+                        for coref in doc.coreferences:
+                            isFound = False
+                            _actor = None
+                            for mention in coref.mentions:
+                                _sen_id = mention.sentence.id
+                                _w_id = mention.head.id
+                                if sen_id == _sen_id and _w_id == possesive_pronoun_id:
+                                    isFound = True
+                                if not _actor and  mention.text in self.actor_list:
+                                    _actor = self.actor_list[mention.text]
+
+                            if isFound and _actor:
+                                actors.append(_actor)
                     
                     # find action verb
                     action_verb = ''
