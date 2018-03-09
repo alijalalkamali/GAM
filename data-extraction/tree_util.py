@@ -63,6 +63,12 @@ class Node(object):
             if child.label.get(field) == value:
                 del self.children[i]
                 return
+            
+    def is_direct_parent(self, node):
+        for child in self.children:
+            if id(child) == id(self):
+                return True
+        return False
 
 
 # def search_lemmas(node, lemmas):
