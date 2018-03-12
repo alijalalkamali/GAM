@@ -4,11 +4,10 @@
 
 ````bash
 
-
 ````
 
-##Input format:
+## Input format
 
 
-##Output format:
+## Output format
 
