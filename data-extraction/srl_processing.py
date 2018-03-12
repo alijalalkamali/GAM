@@ -103,6 +103,8 @@ class SrlProcessor:
                     possesive_pronoun_nodes = state_node[0].find('deprel', 'poss')
                     # Not checking if actor is from state's subtree.
                     actor_nodes = root_node.find_list('form', self.actor_list.keys())
+                    if not actor_nodes:
+                        return None
                     actors = [n.label['form'] for n in actor_nodes]
                     actors_is_dc = []
                     for n1 in actor_nodes:
