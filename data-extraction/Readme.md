@@ -7,7 +7,7 @@ Using pip:
 pip install corenlp_xml
 ```
 
-### Quick Start
+## Usage
 Download ClearNLPwithCoreNLPTokenizer.jar and move data sets into the data folder as following directory structure.
 
 ```
@@ -27,20 +27,15 @@ data-extraction/
 └── word_filter.sh
 ```
 
-Filter data sets
+Extract data from a directory.
 ```
-bash filter.sh 20140519/ClearnlpOutput/Part1
+python3 data-extraction.py              \
+    -i 20140519/ClearnlpOutput/Part1    \
+    -o outputs/20140519/Part1
 ```
-The result file 'list.txt' will be used in the next step.
 
-## Usage
+Parameters:
 
-````bash
-
-````
-
-## Input format
-
-
-## Output format
+- -i:
+- -o:
 
