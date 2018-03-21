@@ -1,6 +1,7 @@
 import argparse
-import subprocess
+import os.path
 import srl_processing
+import subprocess
 
 
 def is_valid_imput(args):
@@ -10,8 +11,8 @@ def is_valid_imput(args):
 
 def main():
     parser = argparse.ArgumentParser(description='Extract data from newsTexts.')
-    parser.add_argument('--inputdir', '-i', help='input train file')
-    parser.add_argument('--outputdir', '-o', help='directory for outputs')
+    parser.add_argument('--inputdir', '-i', required=True, help='input train file')
+    parser.add_argument('--outputdir', '-o', default='outputs/', help='directory for outputs')
     
     args = parser.parse_args()
     
@@ -20,17 +21,21 @@ def main():
     
     # Filtering files by state
     bash_cmd = 'bash filter.sh %s'%args.inputdir
-    subprocess.check_output(bash_cmd, stderr=subprocess.STDOUT)
+    subprocess.call(bash_cmd, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT, shell=True)
     
-    # Process files
+    # Process files. Save in a list.
     sp = srl_processing.SrlProcessor()
     lines = []
     for ans in sp.process_list('list.txt'):
         lines.append(ans)
         
     # Write outputs to files
-    outpath = '%s/out.txt'%args.outputdir
-    with open('outpath', 'a') as fp:
+    if not os.path.isdir(args.outputdir):
+        os.makedirs(args.outputdir)
+    
+    
+    outpath = os.path.join(args.outputdir, 'out.txt')
+    with open(outpath, 'a') as fp:
         fp.writelines(lines)
         
 if __name__ == '__main__':
