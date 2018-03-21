@@ -1,10 +1,11 @@
+import pathlib
 import argparse
 import os.path
 import srl_processing
 import subprocess
 
 
-def is_valid_imput(args):
+def is_valid_input(args):
     '''(TODO:Input validity check)'''
     return True
 
@@ -16,26 +17,24 @@ def main():
     
     args = parser.parse_args()
     
-    if not is_valid_imput(args):
+    if not is_valid_input(args):
         return
     
     # Filtering files by state
-    bash_cmd = 'bash filter.sh %s'%args.inputdir
-    subprocess.call(bash_cmd, stdout=subprocess.STDOUT, stderr=subprocess.STDOUT, shell=True)
+    p = subprocess.Popen(['bash', 'filter.sh', args.inputdir])
+    if p.wait() != 0: return None
     
     # Process files. Save in a list.
     sp = srl_processing.SrlProcessor()
     lines = []
     for ans in sp.process_list('list.txt'):
-        lines.append(ans)
+        if ans:
+            lines.append(ans)
         
     # Write outputs to files
-    if not os.path.isdir(args.outputdir):
-        os.makedirs(args.outputdir)
-    
-    
-    outpath = os.path.join(args.outputdir, 'out.txt')
-    with open(outpath, 'a') as fp:
+    outpath = '%s/out.txt'%args.outputdir
+    pathlib.Path(args.outputdir).mkdir(parents=True, exist_ok=True)
+    with open(outpath, 'w+') as fp:
         fp.writelines(lines)
         
 if __name__ == '__main__':
