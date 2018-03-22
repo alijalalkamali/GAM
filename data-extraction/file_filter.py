@@ -75,8 +75,6 @@ def parse_id():
                     sen_id += 1
                 if content['lemma'] in state_words:
                     _filename = os.path.join(part_id, filename.split('.')[0])
-                    # print(os.path.isfile(get_full_path(prefix_path, corenlp_path, _filename)))
-                    # print(os.path.isfile(get_full_path(prefix_path, text_path, _filename)))
                     if not os.path.isfile(get_full_path(prefix_path, corenlp_path, _filename)):
                         logging.info('file missing: %s'%get_full_path(prefix_path, corenlp_path, _filename))
                         continue
@@ -93,8 +91,6 @@ def parse_id():
 
         if _file_candidates:
             file_candidates.extend(_file_candidates)
-    print(file_candidates)
-    print(reproduce_files)
     if reproduce_files:
         logging.info('Reproduce unmatched files...')
 
@@ -144,8 +140,8 @@ def parse_id():
                             continue
 
                         if not line[0].isdigit():
-                            print(file_path)
-                            print(line)
+                            logging.info(file_path)
+                            logging.info(line)
                             break
 
                         content = {
