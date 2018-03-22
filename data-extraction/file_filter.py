@@ -156,7 +156,7 @@ def parse_id():
                             sen_id += 1
 
                         if content['lemma'] in state_words:
-                            _filename = os.path.join(part_id, filename.split('.')[0])
+                            _filename = get_full_path(prefix_path, clearnlp_path, '{}/{}'.format(part_id, filename.split('.')[0]))
 
                             cand = ','.join((_filename, str(sen_id), str(content['id']), content['lemma']))
                             file_candidates.append(cand)
