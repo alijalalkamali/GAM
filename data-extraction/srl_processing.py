@@ -61,10 +61,16 @@ class SrlProcessor:
         action_verb, state, stative_verb, possesive_pronoun = '_', '_', '_', '_'
         possesive_pronoun_reso = '_'
         
-        
-        srl_filename = 'data/ClearnlpOutput/%s.txt.srl'%filename
-        corenlp_filename = 'data/CorenlpOutput/%s.xml'%filename
+        prefix_name = os.path.join(*(filename.split('/')[:-2]))
+        part_name = os.path.join(*(filename.split('/')[-2:]))
+        srl_filename = os.path.join(
+            prefix_name, 'ClearNLPOutput', '%s.txt.srl'%part_name)
+        corenlp_filename = os.path.join(
+            prefix_name, 'CoreNLPOutput', '%s.xml'%part_name)
         # self.tb.filename = srl_filename
+        
+
+        
         if not os.path.isfile(srl_filename):
             logger.info('%s file missing'%srl_filename)
             return
@@ -91,7 +97,7 @@ class SrlProcessor:
                 # lemma here instead of form
                 stative_verb_nodes = root_node.find_list(
                     'lemma', self.stative_verb_list) 
-                # import pdb; pdb.set_trace()
+                    
                 if not stative_verb_nodes:
                     logger.info('no stative verb found in %d'%sen_id)
                 else:
@@ -135,7 +141,6 @@ class SrlProcessor:
                         doc = Document(xml_string)
 
                         possesive_pronoun_id = possesive_pronoun_nodes[0].label['id']
-                        # import pdb; pdb.set_trace()
                         for coref in doc.coreferences:
                             isFound = False
                             _actor = None
@@ -150,11 +155,11 @@ class SrlProcessor:
                             if isFound and _actor:
                                 actors.append(_actor)
                     
-                    # find action verb
-                    action_verb = ''
+                    # by default action verb is the root
+                    action_verb = root_node.label['form']
                     
-                    return (','.join(actors), ','.join(actors_is_dc),
-                            action_verb, state, stative_verbs,
+                    return (' '.join(actors), ' '.join(actors_is_dc),
+                            action_verb, state, ' '.join(stative_verbs),
                             possesive_pronoun, possesive_pronoun_reso)
 
 

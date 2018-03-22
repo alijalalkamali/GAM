@@ -29,8 +29,8 @@ def main():
     lines = []
     for ans in sp.process_list('list.txt'):
         if ans:
-            lines.append(ans)
-        
+            lines.append('%s\n'%','.join(ans))
+    
     # Write outputs to files
     outpath = os.path.join(args.outputdir, 'out.txt')
     pathlib.Path(args.outputdir).mkdir(parents=True, exist_ok=True)
