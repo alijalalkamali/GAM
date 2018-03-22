@@ -1,8 +1,11 @@
 # Data-extraction
 
 ### Features
-
-
+- Extracts actors and their action that change the states.
+- Check consistency between ClearNLP and CoreNLP tokenization and reproduce \
+CoreNLP output if there are inconsistency.
+- Resolve possesive pronouns by coreference resolution from CoreNLP output.
+- Process all files in a directory.
 
 ### Installation
 This project is based on python3.5+ and jdk8.
