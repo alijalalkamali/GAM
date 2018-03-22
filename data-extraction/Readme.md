@@ -12,7 +12,7 @@ This project is based on python3.5+ and jdk8.
 
 Install dependency using pip:
 ```
-python3.5 -m pip install corenlp_xml
+python3 -m pip install corenlp_xml
 ```
 
 ### Usage
@@ -37,7 +37,7 @@ data_extraction/
 
 Extract data from a directory.
 ```
-python3.5 data_extraction.py              \
+python3 data_extraction.py              \
     -i 20140519/ClearnlpOutput/Part1    \
     -o outputs/20140519/Part1
 ```
