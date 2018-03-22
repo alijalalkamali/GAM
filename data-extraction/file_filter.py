@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import logging
 import os, sys
 import subprocess
 import shutil
@@ -27,8 +28,11 @@ state_words=[
     "trade"
 ]
 
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 def get_full_path(prefix_path, path_format, path):
-    return prefix_path + '/' + path_format.format(path) if prefix_path else path_format.format(path)
+    return os.path.join(prefix_path, path_format.format(path))
 
 def check_corenlp_file(prefix_path, filename, sen_id, content):
     f = open(get_full_path(prefix_path, corenlp_path, filename), 'rb')
@@ -57,7 +61,7 @@ def parse_id():
         file_path = file_path.strip()
         _file_candidates = []
         with open(file_path, 'r') as f:
-            prefix_path = '/'.join(file_path.split('/')[:-3])
+            prefix_path = os.path.join(*(file_path.split('/')[:-3]))
             part_id, filename = tuple(file_path.split('/'))[-2:]
             for line in f:
                 line = line.strip().split()
@@ -69,27 +73,30 @@ def parse_id():
                 }
                 if content['id'] == 1:
                     sen_id += 1
-
                 if content['lemma'] in state_words:
-                    _filename = '{}/{}'.format(part_id, filename.split('.')[0])
-
-                    if not os.path.isfile(get_full_path(prefix_path, corenlp_path, _filename)) or \
-                        not os.path.isfile(get_full_path(prefix_path, text_path, _filename)):
+                    _filename = os.path.join(part_id, filename.split('.')[0])
+                    # print(os.path.isfile(get_full_path(prefix_path, corenlp_path, _filename)))
+                    # print(os.path.isfile(get_full_path(prefix_path, text_path, _filename)))
+                    if not os.path.isfile(get_full_path(prefix_path, corenlp_path, _filename)):
+                        logging.info('file missing: %s'%get_full_path(prefix_path, corenlp_path, _filename))
                         continue
-
+                    if not os.path.isfile(get_full_path(prefix_path, text_path, _filename)):
+                        logging.info('file missing: %s'%get_full_path(prefix_path, text_path, _filename))
+                        continue
                     if not check_corenlp_file(prefix_path, _filename, sen_id, content):
                         reproduce_files.append(_filename)
                         _file_candidates = []
                         break
 
-                    cand = ','.join((_filename, str(sen_id), str(content['id']), content['lemma']))
+                    cand = ','.join((os.path.join(prefix_path, _filename), str(sen_id), str(content['id']), content['lemma']))
                     _file_candidates.append(cand)
 
         if _file_candidates:
             file_candidates.extend(_file_candidates)
-
+    print(file_candidates)
+    print(reproduce_files)
     if reproduce_files:
-        print('Reproduce unmatched files...')
+        logging.info('Reproduce unmatched files...')
 
         if os.path.isdir(reproduce_dir):
             shutil.rmtree(reproduce_dir)
@@ -98,7 +105,7 @@ def parse_id():
         part_file_subpath_list = set()
 
         for file in reproduce_files:
-            print(file)
+            logging.info(file)
             part_id, filename = tuple(file.split('/'))
             part_file_subpath = reproduce_dir + '/' + part_id
             part_file_subpath_list.add(part_file_subpath)
@@ -124,12 +131,12 @@ def parse_id():
 
         # clear temp input directory
         shutil.rmtree(reproduce_dir)
-        print('Reproducing completed!')
+        logging.info('Reproducing completed!')
 
         for part_id in os.listdir(reproduce_output_dir):
-            for filename in os.listdir(reproduce_output_dir + '/' + part_id):
+            for filename in os.listdir(os.path.join(reproduce_output_dir, part_id)):
                 sen_id = 0
-                file_path = '{}/{}/{}'.format(reproduce_output_dir, part_id, filename)
+                file_path = os.path.join(reproduce_output_dir, part_id, filename)
                 with open(file_path, 'r') as f:
                     for line in f:
                         line = line.strip().split()
@@ -149,7 +156,7 @@ def parse_id():
                             sen_id += 1
 
                         if content['lemma'] in state_words:
-                            _filename = '{}/{}'.format(part_id, filename.split('.')[0])
+                            _filename = os.path.join(part_id, filename.split('.')[0])
 
                             cand = ','.join((_filename, str(sen_id), str(content['id']), content['lemma']))
                             file_candidates.append(cand)

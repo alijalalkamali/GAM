@@ -1,8 +1,12 @@
 # Data-extraction
 
 ### Installation
-This project is based on python3.
-Using pip:
+This project is based on python3.5+:
+```
+sudo apt-get install python3.5
+```
+
+Install dependency using pip:
 ```
 pip install corenlp_xml
 ```
@@ -29,7 +33,7 @@ data-extraction/
 
 Extract data from a directory.
 ```
-python3 data-extraction.py              \
+python3.5 data-extraction.py              \
     -i 20140519/ClearnlpOutput/Part1    \
     -o outputs/20140519/Part1
 ```

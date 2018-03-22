@@ -32,7 +32,7 @@ def main():
             lines.append(ans)
         
     # Write outputs to files
-    outpath = '%s/out.txt'%args.outputdir
+    outpath = os.path.join(args.outputdir, 'out.txt')
     pathlib.Path(args.outputdir).mkdir(parents=True, exist_ok=True)
     with open(outpath, 'w+') as fp:
         fp.writelines(lines)
