@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
+import argparse
 import logging
 import os, sys
 import subprocess
@@ -28,6 +29,9 @@ state_words=[
     "trade"
 ]
 
+parser = argparse.ArgumentParser(description='Extract data from newsTexts.')
+parser.add_argument('--reproduce', '-r', action='store_true', help='reproduce inconsistent tree')
+args = parser.parse_args()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -81,7 +85,7 @@ def parse_id():
                     if not os.path.isfile(get_full_path(prefix_path, text_path, _filename)):
                         logging.info('file missing: %s'%get_full_path(prefix_path, text_path, _filename))
                         continue
-                    if not check_corenlp_file(prefix_path, _filename, sen_id, content):
+                    if not args.reproduce and not check_corenlp_file(prefix_path, _filename, sen_id, content):
                         reproduce_files.append(_filename)
                         _file_candidates = []
                         break
@@ -120,9 +124,9 @@ def parse_id():
             output_dir = reproduce_output_dir + '/' + part_id
             if not os.path.isdir(output_dir):
                 os.makedirs(output_dir)
-
             p = subprocess.Popen(['java', '-jar', 'ClearNLPwithCoreNLPTokenizer.jar', path, output_dir])
 
+            # TODO: log the exceptions from java process.
             if p.wait() != 0: return None
 
         # clear temp input directory

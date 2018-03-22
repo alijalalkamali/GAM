@@ -127,7 +127,7 @@ class SrlProcessor:
                         
                         
                     else:
-                        possesive_pronoun = possesive_pronoun_nodes[0]
+                        possesive_pronoun = possesive_pronoun_nodes[0].label['form']
                         logger.info('possesive pronoun found in %d: %d, first is %s'%(
                             sen_id,
                             len(possesive_pronoun_nodes),
@@ -153,14 +153,16 @@ class SrlProcessor:
                                     _actor = self.actor_list[mention.text]
 
                             if isFound and _actor:
+                                possesive_pronoun_reso = _actor
                                 actors.append(_actor)
                     
                     # by default action verb is the root
                     action_verb = root_node.label['form']
                     
-                    return (' '.join(actors), ' '.join(actors_is_dc),
-                            action_verb, state, ' '.join(stative_verbs),
-                            possesive_pronoun, possesive_pronoun_reso)
+                    return (';'.join(actors), ';'.join(actors_is_dc),
+                            action_verb, state, ';'.join(stative_verbs),
+                            # possesive_pronoun, possesive_pronoun_reso
+                            )
 
 
     def process_list(self, list_filename):
