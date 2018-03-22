@@ -37,38 +37,38 @@ class GAMWorldStateInitializer:
     def getActionProbabilities(self):
         action_probabilities = {}
         for action_name in self.action_names:
+            action_probabilities[action_name] = {}
             for state in self.states:
                 val = self.cooc[state][self.cooc.X == action_name].iloc[0]
                 if not isinstance(val, str):
                     continue
                 else:
                     prob = val.split("-")
-                    probIncrease = int(prob[0]) / 100.0
-                    probDecrease = int(prob[1]) / 100.0
-                    action_probabilities[action_name] = {'state': state,
-                                                         'probIncrease': probIncrease,
-                                                         'probDecrease': probDecrease}
+                    probIncrease = abs(int(prob[0]) / 100.0)
+                    probDecrease = abs(int(prob[1]) / 100.0)
+                    action_probabilities[action_name][state] = {'probIncrease': probIncrease,
+                                                                'probDecrease': probDecrease}
         return action_probabilities
 
     def createActions(self, pos_vars_weights=None, neg_vars_weights=None):
         for agent in self.agents:
-            for action_name, variables in self.action_probabilities.iteritems():
-                state = variables['state']
-                if state in pos_vars_weights:
-                    weight = pos_vars_weights[state]
-                elif state in neg_vars_weights:
-                    weight = neg_vars_weights[state]
-                else:
-                    weight = self.DEFAULT_ACTION_WEIGHT
+            for action_name, states in self.action_probabilities.iteritems():
+                for state, probabilities in states.iteritems():
+                    if state in pos_vars_weights:
+                        weight = pos_vars_weights[state]
+                    elif state in neg_vars_weights:
+                        weight = neg_vars_weights[state]
+                    else:
+                        weight = self.DEFAULT_ACTION_WEIGHT
 
-                action = agent.addAction({'verb': action_name})
+                    action = agent.addAction({'verb': action_name})
 
-                tree = makeTree({'distribution': [
-                    (incrementMatrix(stateKey(action['subject'], state), weight), variables['probIncrease']),
-                    (incrementMatrix(stateKey(action['subject'], state), weight), variables['probDecrease'])
-                    ]})
+                    tree = makeTree({'distribution': [
+                        (incrementMatrix(stateKey(action['subject'], state), weight), probabilities['probIncrease']),
+                        (incrementMatrix(stateKey(action['subject'], state), weight), probabilities['probDecrease'])
+                        ]})
 
-                self.world.setDynamics(stateKey(action['subject'], state), action, tree)
+                    self.world.setDynamics(stateKey(action['subject'], state), action, tree)
 
     # Currently applies termination condition to all agents
     def setTerminationCondition(self, goal_state, end_value):
@@ -99,9 +99,9 @@ world = World()
 
 # Create Agents
 a1 = Agent("A1")
-a1.setHorizon(5)
+a1.setHorizon(3)
 a2 = Agent("A2")
-a2.setHorizon(5)
+a2.setHorizon(3)
 
 # Add agents to world
 world.addAgent(a1)
@@ -114,6 +114,8 @@ pos_vars_weights = {'force': 1.0, 'cooperation': 1.0, 'welfare': 1.0, 'military'
 neg_vars_weights = {'price': 1.0, 'tension': 1.0}
 
 gwsi = GAMWorldStateInitializer(cooc, world, [a1, a2])
+print gwsi.states
+print gwsi.action_probabilities
 gwsi.setStates()
 gwsi.createActions(pos_vars_weights=pos_vars_weights, neg_vars_weights=neg_vars_weights)
 
@@ -122,12 +124,13 @@ print "Start Simulation"
 world.setOrder(world.agents.keys())
 
 # Set Termination Conditions
-gwsi.setTerminationCondition("economy", 0)  # economy tanks
-gwsi.setTerminationCondition("economy", 200)  # OR economy doubles
+gwsi.setTerminationCondition("economy", 90)  # economy decreases by 10 %
+gwsi.setTerminationCondition("economy", 110)  # OR economy increases by 10%
+gwsi.setTerminationCondition("tension", 90)  # tension decreases by 10 %
+gwsi.setTerminationCondition("tension", 110)  # OR tension increases by 10%
 
 # Set Rewards
 gwsi.setRewardCondition("max", "economy")
-gwsi.setRewardCondition("max", "welfare")
 gwsi.setRewardCondition("min", "tension")
 
 while not world.terminated():
