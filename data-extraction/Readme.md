@@ -44,7 +44,7 @@ Parameters:
 
 - -i: The directory which contains the ClearNLPOutput.
 - -o: The directory for output file. The output files will be saved in name \
-- {date}_{part}.txt
+{date}_{part}.txt
 - -p: Process one part at a time. If this flag is present, the input directory \
 should be like:
 ```
