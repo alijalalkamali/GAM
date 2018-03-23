@@ -54,9 +54,10 @@ python3 data_extraction.py -i data/20140519/ClearNLPOutput/Part1 -p
 ### Output format
 The output is saved in csv format. 
 ```
-Azerbaijani;Brazilian,0;0,play,cooperation,expanding
+data/20140519/Part1/newsText22,Azerbaijani;Brazilian,0;0,play,trade,expanding
 ```
 Columns:
+- Source. The incomplete path of the source file.
 - Actors. If there are more than one actors, they are separated by semicolons.
 - Relation between actors and stative verb. 0 if actor is not a direct child \
 of stative verb. If actor is a direct child of stative verb. If there are more \
