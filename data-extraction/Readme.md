@@ -37,16 +37,19 @@ data_extraction/
 
 Extract data from a directory.
 ```
-python3 data_extraction.py              \
-    -i 20140519/ClearnlpOutput/Part1    \
-    -o outputs/20140519/Part1
+python3 data_extraction.py -i data/20140519
 ```
 
 Parameters:
 
-- -i:The directory which contains the ClearNLPOutput. Currently this command \
-can only process one part at a time. We are working on batch inputs.
-- -o:The directory for output file.
+- -i: The directory which contains the ClearNLPOutput.
+- -o: The directory for output file. The output files will be saved in name \
+- {date}_{part}.txt
+- -p: Process one part at a time. If this flag is present, the input directory \
+should be like:
+```
+python3 data_extraction.py -i data/20140519/ClearNLPOutput/Part1 -p
+```
 
 ### Output format
 The output is saved in csv format. 

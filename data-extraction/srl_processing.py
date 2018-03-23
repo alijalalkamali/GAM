@@ -67,10 +67,7 @@ class SrlProcessor:
             prefix_name, 'ClearNLPOutput', '%s.txt.srl'%part_name)
         corenlp_filename = os.path.join(
             prefix_name, 'CoreNLPOutput', '%s.xml'%part_name)
-        # self.tb.filename = srl_filename
-        
 
-        
         if not os.path.isfile(srl_filename):
             logger.info('%s file missing'%srl_filename)
             return
@@ -87,23 +84,23 @@ class SrlProcessor:
             # Finding state node by provided word id
             state_node = root_node.find('id', w_id)
             if not state_node:
-                logger.info('no state found in sentence:%d root:%s'%(
+                logger.debug('no state found in sentence:%d root:%s'%(
                     sen_id, root_node.label['form']))
                 # Continue to find the id in next root node.
             else:
                 state = state_node[0].label['form']
-                logger.info('state:%s'%str(state))
+                logger.debug('state:%s'%str(state))
                 
                 # lemma here instead of form
                 stative_verb_nodes = root_node.find_list(
                     'lemma', self.stative_verb_list) 
                     
                 if not stative_verb_nodes:
-                    logger.info('no stative verb found in %d'%sen_id)
+                    logger.debug('no stative verb found in %d'%sen_id)
                 else:
                     stative_verbs = [n.label['form'] for n in stative_verb_nodes]
                     stative_verb = ','.join(stative_verbs)
-                    logger.info('stative verbs:%s'%str(stative_verbs))
+                    logger.debug('stative verbs:%s'%str(stative_verbs))
                     
                     # Change find to direct children
                     possesive_pronoun_nodes = state_node[0].find('deprel', 'poss')
@@ -122,13 +119,13 @@ class SrlProcessor:
                             actors_is_dc.append('0')
                                 
                     if not possesive_pronoun_nodes:
-                        logger.info('no possesive pronoun found in %d'%sen_id)
+                        logger.debug('no possesive pronoun found in %d'%sen_id)
                         # find actor directly.
                         
                         
                     else:
                         possesive_pronoun = possesive_pronoun_nodes[0].label['form']
-                        logger.info('possesive pronoun found in %d: %d, first is %s'%(
+                        logger.debug('possesive pronoun found in %d: %d, first is %s'%(
                             sen_id,
                             len(possesive_pronoun_nodes),
                             possesive_pronoun))
@@ -179,10 +176,10 @@ class SrlProcessor:
             
             for line in f:
                 filename, sen_id, w_id, word = tuple(line.strip().split(','))
-                # (TODO: Make unified directory resolution.)
-                filename = '%s'%filename
                 logger.info('processing '+filename)
-                yield self.process_sentence(filename, int(sen_id), int(w_id))
+                ret = self.process_sentence(filename, int(sen_id), int(w_id))
+                if ret:
+                    yield (filename,) + ret
         
 
 def main():
