@@ -58,7 +58,7 @@ class SrlProcessor:
                       Here should have possesive pronoun is the direct child 
         '''
         actor, actor_is_dc = '_', '_'
-        action_verb, state, stative_verb, possesive_pronoun = '_', '_', '_', '_'
+        action_verb, state, stative_verb, possesive_pronoun = '_', '_', '~', '_'
         possesive_pronoun_reso = '_'
         
         prefix_name = os.path.join(*(filename.split('/')[:-2]))
@@ -92,15 +92,14 @@ class SrlProcessor:
                 logger.debug('state:%s'%str(state))
                 
                 # lemma here instead of form
-                stative_verb_nodes = root_node.find_list(
+                stative_verb_node = state_node[0].rev_find_list(
                     'lemma', self.stative_verb_list) 
                     
-                if not stative_verb_nodes:
+                if not stative_verb_node:
                     logger.debug('no stative verb found in %d'%sen_id)
                 else:
-                    stative_verbs = [n.label['form'] for n in stative_verb_nodes]
-                    stative_verb = ','.join(stative_verbs)
-                    logger.debug('stative verbs:%s'%str(stative_verbs))
+                    stative_verb = stative_verb_node.label['form']
+                    logger.debug('stative verb:%s'%str(stative_verb))
                     
                     # Change find to direct children
                     possesive_pronoun_nodes = state_node[0].find('deprel', 'poss')
@@ -111,10 +110,8 @@ class SrlProcessor:
                     actors = [n.label['form'] for n in actor_nodes]
                     actors_is_dc = []
                     for n1 in actor_nodes:
-                        for n2 in stative_verb_nodes:
-                            if n2.is_direct_parent(n1):
-                                actors_is_dc.append('1')
-                                break
+                        if stative_verb_node.is_parent(n1):
+                            actors_is_dc.append('1')
                         else:
                             actors_is_dc.append('0')
                                 
@@ -138,26 +135,27 @@ class SrlProcessor:
                         doc = Document(xml_string)
 
                         possesive_pronoun_id = possesive_pronoun_nodes[0].label['id']
-                        for coref in doc.coreferences:
-                            isFound = False
-                            _actor = None
-                            for mention in coref.mentions:
-                                _sen_id = mention.sentence.id
-                                _w_id = mention.head.id
-                                if sen_id == _sen_id and _w_id == possesive_pronoun_id:
-                                    isFound = True
-                                if not _actor and  mention.text in self.actor_list:
-                                    _actor = self.actor_list[mention.text]
-
-                            if isFound and _actor:
-                                possesive_pronoun_reso = _actor
-                                actors.append(_actor)
+                        if doc.coreferences:
+                            for coref in doc.coreferences:
+                                isFound = False
+                                _actor = None
+                                for mention in coref.mentions:
+                                    _sen_id = mention.sentence.id
+                                    _w_id = mention.head.id
+                                    if sen_id == _sen_id and _w_id == possesive_pronoun_id:
+                                        isFound = True
+                                    if not _actor and  mention.text in self.actor_list:
+                                        _actor = self.actor_list[mention.text]
+    
+                                if isFound and _actor:
+                                    possesive_pronoun_reso = _actor
+                                    actors.append(_actor)
                     
                     # by default action verb is the root
                     action_verb = root_node.label['form']
                     
                     return (';'.join(actors), ';'.join(actors_is_dc),
-                            action_verb, state, ';'.join(stative_verbs),
+                            action_verb, state, stative_verb,
                             # possesive_pronoun, possesive_pronoun_reso
                             )
 

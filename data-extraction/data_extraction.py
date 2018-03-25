@@ -51,7 +51,6 @@ def main():
     
     if args.part:
         outputname = '%s.txt'%(gen_output_filename(args.inputdir))
-        # import pdb; pdb.set_trace()
         extract_part(args.inputdir, args.outputdir, outputname)
     else:
         clearnlp_dir = os.path.join(args.inputdir, 'ClearNLPOutput')

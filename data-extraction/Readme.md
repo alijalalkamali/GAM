@@ -56,12 +56,15 @@ The output is saved in csv format.
 ```
 data/20140519/Part1/newsText22,Azerbaijani;Brazilian,0;0,play,trade,expanding
 ```
-Columns:
+Each line contains these columns:
 - Source. The incomplete path of the source file.
 - Actors. If there are more than one actors, they are separated by semicolons.
-- Relation between actors and stative verb. 0 if actor is not a direct child \
-of stative verb. If actor is a direct child of stative verb. If there are more \
+- Relation between actors and stative verb. 0 if actor is not in the subtree \
+of stative verb. If actor is in the subtree of stative verb. If there are more \
 than one actors, they are separated by semicolons.
 - Action verb.
 - State.
 - Stative verb.
+
+### Known Issues
+- Some output line do not have actor.
