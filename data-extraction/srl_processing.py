@@ -122,13 +122,12 @@ class SrlProcessor:
                         
                     else:
                         possesive_pronoun = possesive_pronoun_nodes[0].label['form']
-                        logger.debug('possesive pronoun found in %d: %d, first is %s'%(
+                        logger.info('possesive pronoun found in %d: %d, first is %s'%(
                             sen_id,
                             len(possesive_pronoun_nodes),
                             possesive_pronoun))
                         
                         # find actor through corenlp.
-                        actors = []
                         f = open(corenlp_filename, 'rb')
                         xml_string = f.read()
                         f.close()
@@ -150,6 +149,7 @@ class SrlProcessor:
                                 if isFound and _actor:
                                     possesive_pronoun_reso = _actor
                                     actors.append(_actor)
+                                    
                     
                     # by default action verb is the root
                     action_verb = root_node.label['form']
