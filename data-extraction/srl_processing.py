@@ -2,6 +2,7 @@
 Basic implementation of SRL processing tasks discussed on Feb 16.
 '''
 
+import file_util
 import logging
 import tree_builder
 import os.path
@@ -12,10 +13,10 @@ logger = logging.getLogger(__name__)
 
 class SrlProcessor:
     def __init__(self):
-        self.stative_path = 'data/params/stativewords.txt'
-        self.stative_verb_list = self.file_loader(self.stative_path)
-        self.actor_path = 'data/params/country_nationality.txt'
-        self.actor_list = self.get_country_list(self.actor_path)
+        stative_path = 'data/params/stativewords.txt'
+        self.stative_verb_list = file_util.file_loader(stative_path)
+        actor_path = 'data/params/country_nationality.txt'
+        self.actor_list = self.get_country_list(actor_path)
         
         # self.states_path = 'params/states.txt'
         # self.base_forms = self.file_loader(self.states_path)
@@ -32,16 +33,6 @@ class SrlProcessor:
                     for country in line:
                         country_list[country] = _country
         return country_list
-    
-    def file_loader(self, filename, col=0):
-        '''
-        Read certain coloumn from text file.
-        '''
-        with open(filename) as fp:
-            ret = fp.readlines()
-            ret = [line.split()[col] for line in ret]
-            return ret
-        return None
 
     
     def process_sentence(self, filename, sen_id, w_id):
@@ -98,7 +89,7 @@ class SrlProcessor:
                 if not stative_verb_node:
                     logger.debug('no stative verb found in %d'%sen_id)
                 else:
-                    stative_verb = stative_verb_node.label['form']
+                    stative_verb = stative_verb_node.label['lemma']
                     logger.debug('stative verb:%s'%str(stative_verb))
                     
                     # Change find to direct children
@@ -152,7 +143,7 @@ class SrlProcessor:
                                     
                     
                     # by default action verb is the root
-                    action_verb = root_node.label['form']
+                    action_verb = root_node.label['lemma']
                     
                     return (';'.join(actors), ';'.join(actors_is_dc),
                             action_verb, state, stative_verb,

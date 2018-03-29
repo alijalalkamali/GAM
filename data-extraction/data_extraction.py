@@ -20,7 +20,7 @@ def extract_part(inputdir, outputdir, outputname):
     p = subprocess.Popen(['bash', 'filter.sh', inputdir])
     if p.wait() != 0: return None
     
-    # Process files. Save in a list.
+    # Process files. Save in a list. Can use generator instead of buffering.
     lines = []
     for ans in sp.process_list('list.txt'):
         if ans:
@@ -55,10 +55,10 @@ def main():
     else:
         clearnlp_dir = os.path.join(args.inputdir, 'ClearNLPOutput')
         if not os.path.isdir(clearnlp_dir):
-            logging.warning(
+            logger.warning(
                 'ClearNLPOutput path \'%s\' doesn\'t exist', clearnlp_dir)
         for part_id in os.listdir(clearnlp_dir):
-            logging.info('Processing %s', part_id)
+            logger.info('Processing %s', part_id)
             inputdir = os.path.join(clearnlp_dir, part_id)
             outputname = '%s.txt'%(gen_output_filename(inputdir))
             extract_part(inputdir, args.outputdir, outputname)

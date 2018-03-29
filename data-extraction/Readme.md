@@ -28,6 +28,8 @@ data_extraction/
 │   │   └── NewsTextFiles   
 │   └── params
 │       ├── country_nationality.txt
+│       ├── neg_stative.txt
+│       ├── state.txt
 │       └── stativewords.txt
 ├── file_filter.py
 ├── filter.sh
@@ -35,7 +37,7 @@ data_extraction/
 └── word_filter.sh
 ```
 
-Extract data from a directory.
+#### Extract data from a directory.
 ```
 python3 data_extraction.py -i data/20140519
 ```
@@ -43,13 +45,24 @@ python3 data_extraction.py -i data/20140519
 Parameters:
 
 - -i: The directory which contains the ClearNLPOutput.
-- -o: The directory for output file. The output files will be saved in name \
+- -o:(optional) The directory for output file. The output files will be saved in name \
 {date}_{part}.txt
-- -p: Process one part at a time. If this flag is present, the input directory \
+- -p:(optional) Process one part at a time. If this flag is present, the input directory \
 should be like:
 ```
 python3 data_extraction.py -i data/20140519/ClearNLPOutput/Part1 -p
 ```
+
+#### Generate statistic summary.
+```
+python3 statistic.py -i outputs
+```
+
+Parameters:
+
+- -i: The directory which contains the data extraction output.
+- -o:(optional) The directory for output file. The output files will be saved in name \
+summary.txt
 
 ### Output format
 The output is saved in csv format. 
@@ -67,4 +80,4 @@ than one actors, they are separated by semicolons.
 - Stative verb.
 
 ### Known Issues
-- Some output line do not have actor.
+- Processing multiple dates at a time seems needed.
