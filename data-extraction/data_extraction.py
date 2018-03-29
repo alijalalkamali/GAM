@@ -2,6 +2,7 @@ import argparse
 import logging
 import os.path
 import pathlib
+import re
 import srl_processing
 import subprocess
 
@@ -37,10 +38,9 @@ def main():
     parser = argparse.ArgumentParser(description='Extract data from newsTexts.')
     parser.add_argument('--inputdir', '-i', required=True, help='input train file')
     parser.add_argument('--outputdir', '-o', default='outputs/', help='directory for outputs')
-    parser.add_argument('--part', '-p', action='store_true', help='process part directory')
 
     args = parser.parse_args()
-    args.inputdir = args.inputdir.rstrip('/')
+    full_inputdir = args.inputdir.rstrip('/')
     
     if not is_valid_input(args):
         return
@@ -49,11 +49,12 @@ def main():
         _dir_split = _dir.split('/')
         return '_'.join([_dir_split[-3], _dir_split[-1]])
     
-    if args.part:
-        outputname = '%s.txt'%(gen_output_filename(args.inputdir))
-        extract_part(args.inputdir, args.outputdir, outputname)
-    else:
-        clearnlp_dir = os.path.join(args.inputdir, 'ClearNLPOutput')
+    def process_part(input_dir):
+        outputname = '%s.txt'%(gen_output_filename(input_dir))
+        extract_part(input_dir, args.outputdir, outputname)
+        
+    def process_date(input_dir):
+        clearnlp_dir = os.path.join(input_dir, 'ClearNLPOutput')
         if not os.path.isdir(clearnlp_dir):
             logger.warning(
                 'ClearNLPOutput path \'%s\' doesn\'t exist', clearnlp_dir)
@@ -62,7 +63,22 @@ def main():
             inputdir = os.path.join(clearnlp_dir, part_id)
             outputname = '%s.txt'%(gen_output_filename(inputdir))
             extract_part(inputdir, args.outputdir, outputname)
-    
+            
+    # Matching different level of input
+    if re.match(r'\\Part[0-9]*$', full_inputdir):
+        part_dir = full_inputdir
+        process_part(part_dir)
+    elif re.match(r'\\[0-9]{8}$', full_inputdir):
+        date_dir = full_inputdir
+        process_date(date_dir)
+    else:
+        for date in os.listdir(full_inputdir):
+            if not re.match('^[0-9]{8}$', date):
+                # Not a date
+                continue
+            date_dir = os.path.join(full_inputdir, date)
+            process_date(date_dir)
+            
         
 if __name__ == '__main__':
     main()

@@ -44,13 +44,19 @@ python3 data_extraction.py -i data/20140519
 
 Parameters:
 
-- -i: The directory which contains the ClearNLPOutput.
+- -i: The directory which contains the output files.
 - -o:(optional) The directory for output file. The output files will be saved in name \
-{date}_{part}.txt
-- -p:(optional) Process one part at a time. If this flag is present, the input directory \
-should be like:
+{date}_{part}.txt. By default it will be saved in 'outputs' folder.
+
+Examples:
 ```
-python3 data_extraction.py -i data/20140519/ClearNLPOutput/Part1 -p
+python3 data_extraction.py -i data
+```
+```
+python3 data_extraction.py -i data/20140519
+```
+```
+python3 data_extraction.py -i data/20140519/ClearNLPOutput/Part1
 ```
 
 #### Generate statistic summary.
@@ -67,7 +73,7 @@ summary.txt
 ### Output format
 The output is saved in csv format. 
 ```
-data/20140519/Part1/newsText22,Azerbaijani;Brazilian,0;0,play,trade,expanding
+data/20140519/Part1/newsText22,Azerbaijani;Brazilian,0;0,play,trade,expand
 ```
 Each line contains these columns:
 - Source. The incomplete path of the source file.
@@ -80,4 +86,3 @@ than one actors, they are separated by semicolons.
 - Stative verb.
 
 ### Known Issues
-- Processing multiple dates at a time seems needed.
