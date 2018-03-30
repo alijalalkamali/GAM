@@ -39,7 +39,7 @@ data_extraction/
 
 #### Extract data from a directory.
 ```
-python3 data_extraction.py -i data/20140519
+python3 data_extraction.py -i data
 ```
 
 Parameters:
