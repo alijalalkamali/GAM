@@ -28,6 +28,9 @@ class CoocurrenceCounter:
         return stative_verb in self.negative_list
         
     def generate_report(self):
+        # Print Title
+        yield 'X,{},Total Count'.format(','.join(self.state_list) )
+
         for action in self.actions:
             tokens = [action]
             total_with_action = 0
@@ -66,6 +69,8 @@ def main():
     for filename in os.listdir(input_dir):
         if len(filename) > 0 and filename[0] == '.':
             continue
+        if filename == outputname:
+            continue
         # Count coocurrence from file.
         with open(os.path.join(input_dir, filename)) as fp:
             for line in fp.readlines():
@@ -74,10 +79,6 @@ def main():
     
     outpath = os.path.join(output_dir, outputname)         
     with open(outpath, 'w+') as fp:
-        # Print Title
-        state_list = file_util.file_loader('data/params/state.txt')
-        title_line = 'X,{},Total Count\n'.format(','.join(state_list) )
-        fp.write(title_line)
 
         for line in counter.generate_report():
             fp.write(line)
