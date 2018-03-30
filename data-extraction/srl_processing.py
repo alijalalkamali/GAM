@@ -79,7 +79,7 @@ class SrlProcessor:
                     sen_id, root_node.label['form']))
                 # Continue to find the id in next root node.
             else:
-                state = state_node[0].label['form']
+                state = state_node[0].label['lemma']
                 logger.debug('state:%s'%str(state))
                 
                 # lemma here instead of form

@@ -25,7 +25,7 @@ class CoocurrenceCounter:
             self.negative_count[action][state] += 1
         
     def is_positive(self, stative_verb):
-        return stative_verb in self.negative_list
+        return stative_verb not in self.negative_list
         
     def generate_report(self):
         # Print Title
@@ -74,7 +74,7 @@ def main():
         # Count coocurrence from file.
         with open(os.path.join(input_dir, filename)) as fp:
             for line in fp.readlines():
-                tokens = line.split(',')
+                tokens = line.strip().split(',')
                 counter.count(tokens[4], tokens[3], tokens[5])
     
     outpath = os.path.join(output_dir, outputname)         
