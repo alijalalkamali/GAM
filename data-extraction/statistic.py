@@ -64,6 +64,8 @@ def main():
     
     counter = CoocurrenceCounter()
     for filename in os.listdir(input_dir):
+        if len(filename) > 0 and filename[0] == '.':
+            continue
         # Count coocurrence from file.
         with open(os.path.join(input_dir, filename)) as fp:
             for line in fp.readlines():
