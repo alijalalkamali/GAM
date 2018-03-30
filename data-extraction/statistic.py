@@ -40,7 +40,7 @@ class CoocurrenceCounter:
                     continue
                 total_with_action += total
                 ratio = self.positive_count[action][state]/total
-                tokens.append('%d - %d'%(ratio*100, 100-ratio*100))
+                tokens.append('%d-%d'%(ratio*100, 100-ratio*100))
             tokens.append(str(total_with_action))
             yield ','.join(tokens)
         
@@ -74,6 +74,11 @@ def main():
     
     outpath = os.path.join(output_dir, outputname)         
     with open(outpath, 'w+') as fp:
+        # Print Title
+        state_list = file_util.file_loader('data/params/state.txt')
+        title_line = 'X,{},Total Count\n'.format(','.join(state_list) )
+        fp.write(title_line)
+
         for line in counter.generate_report():
             fp.write(line)
             fp.write('\n')
