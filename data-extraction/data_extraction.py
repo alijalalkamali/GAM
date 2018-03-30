@@ -65,13 +65,15 @@ def main():
             extract_part(inputdir, args.outputdir, outputname)
             
     # Matching different level of input
-    if re.match(r'\\Part[0-9]*$', full_inputdir):
+    logger.info('Input directory: %s', full_inputdir)
+    if re.match(r'.*\Part[0-9]*$', full_inputdir):
         part_dir = full_inputdir
         process_part(part_dir)
-    elif re.match(r'\\[0-9]{8}$', full_inputdir):
+    elif re.match(r'.*\[0-9]{8}$', full_inputdir):
         date_dir = full_inputdir
         process_date(date_dir)
     else:
+        logger.info('Batch date input')
         for date in os.listdir(full_inputdir):
             if not re.match('^[0-9]{8}$', date):
                 # Not a date
