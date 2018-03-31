@@ -23,6 +23,11 @@ class SrlProcessor:
                 
         self.tb = tree_builder.TreeBuilder()
         
+        # Summary
+        self.state_count = 0
+        self.stative_verb_count = 0
+        self.actor_count = 0
+        
     def get_country_list(self, country_list_file):
         country_list = {}
         with open(country_list_file) as f:
@@ -80,6 +85,7 @@ class SrlProcessor:
                 # Continue to find the id in next root node.
             else:
                 state = state_node[0].label['lemma']
+                self.state_count += 1
                 logger.debug('state:%s'%str(state))
                 
                 # lemma here instead of form
@@ -90,21 +96,21 @@ class SrlProcessor:
                     logger.debug('no stative verb found in %d'%sen_id)
                 else:
                     stative_verb = stative_verb_node.label['lemma']
+                    self.stative_verb_count += 1
                     logger.debug('stative verb:%s'%str(stative_verb))
                     
                     # Change find to direct children
                     possesive_pronoun_nodes = state_node[0].find('deprel', 'poss')
                     # Not checking if actor is from state's subtree.
                     actor_nodes = root_node.find_list('form', self.actor_list.keys())
-                    if not actor_nodes:
+                    if not actor_nodes and not possesive_pronoun_nodes:
                         return None
+                    
+                    # Either actor or possesive pronoun is found.
+                    # But coreference may not be solved.
+
                     actors = [n.label['form'] for n in actor_nodes]
                     actors_is_dc = []
-                    for n1 in actor_nodes:
-                        if stative_verb_node.is_parent(n1):
-                            actors_is_dc.append('1')
-                        else:
-                            actors_is_dc.append('0')
                                 
                     if not possesive_pronoun_nodes:
                         logger.debug('no possesive pronoun found in %d'%sen_id)
@@ -123,24 +129,32 @@ class SrlProcessor:
                         xml_string = f.read()
                         f.close()
                         doc = Document(xml_string)
-
-                        possesive_pronoun_id = possesive_pronoun_nodes[0].label['id']
-                        if doc.coreferences:
-                            for coref in doc.coreferences:
-                                isFound = False
-                                _actor = None
-                                for mention in coref.mentions:
-                                    _sen_id = mention.sentence.id
-                                    _w_id = mention.head.id
-                                    if sen_id == _sen_id and _w_id == possesive_pronoun_id:
-                                        isFound = True
-                                    if not _actor and  mention.text in self.actor_list:
-                                        _actor = self.actor_list[mention.text]
-    
-                                if isFound and _actor:
-                                    possesive_pronoun_reso = _actor
-                                    actors.append(_actor)
-                                    
+                        
+                        for possesive_pronoun_node in possesive_pronoun_nodes:
+                            possesive_pronoun_id = possesive_pronoun_node.label['id']
+                            if doc.coreferences:
+                                for coref in doc.coreferences:
+                                    isFound = False
+                                    _actor = None
+                                    for mention in coref.mentions:
+                                        _sen_id = mention.sentence.id
+                                        _w_id = mention.head.id
+                                        if sen_id == _sen_id and _w_id == possesive_pronoun_id:
+                                            isFound = True
+                                        if not _actor and  mention.text in self.actor_list:
+                                            _actor = self.actor_list[mention.text]
+        
+                                    if isFound and _actor:
+                                        possesive_pronoun_reso = _actor
+                                        actors.append(_actor)
+                                        actor_nodes.append(possesive_pronoun_node)
+                    if actor_nodes:
+                        self.actor_count += 1
+                    for n1 in actor_nodes:
+                        if stative_verb_node.is_parent(n1):
+                            actors_is_dc.append('1')
+                        else:
+                            actors_is_dc.append('0')                
                     
                     # by default action verb is the root
                     action_verb = root_node.label['lemma']

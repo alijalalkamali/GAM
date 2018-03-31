@@ -81,6 +81,15 @@ def main():
             date_dir = os.path.join(full_inputdir, date)
             process_date(date_dir)
             
+    # Report
+    print('***********************************')
+    print('End of data extraction.')
+    print('# of sentence with state: %d', sp.state_count)
+    print('# of sentence with stative verb: %d', sp.stative_verb_count)
+    print('# of sentence with actor: %d', sp.actor_count)
+    print('***********************************')
+    
+            
         
 if __name__ == '__main__':
     main()
