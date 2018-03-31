@@ -65,8 +65,11 @@ class SrlProcessor:
             prefix_name, 'CoreNLPOutput', '%s.xml'%part_name)
 
         if not os.path.isfile(srl_filename):
-            logger.info('%s file missing'%srl_filename)
-            return
+            srl_filename = os.path.join(
+                prefix_name, 'ClearnlpOutput', '%s.txt.srl'%part_name)
+            if not os.path.isfile(srl_filename):
+                logger.info('%s file missing'%srl_filename)
+                return
         if not os.path.isfile(corenlp_filename):
             logger.info('%s file missing'%corenlp_filename)
             return
@@ -163,7 +166,6 @@ class SrlProcessor:
                             action_verb, state, stative_verb,
                             # possesive_pronoun, possesive_pronoun_reso
                             )
-
 
     def process_list(self, list_filename):
         '''

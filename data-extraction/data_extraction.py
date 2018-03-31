@@ -56,8 +56,11 @@ def main():
     def process_date(input_dir):
         clearnlp_dir = os.path.join(input_dir, 'ClearNLPOutput')
         if not os.path.isdir(clearnlp_dir):
-            logger.warning(
-                'ClearNLPOutput path \'%s\' doesn\'t exist', clearnlp_dir)
+            clearnlp_dir = os.path.join(input_dir, 'ClearnlpOutput')
+            if not os.path.isdir(clearnlp_dir):
+                logger.warning(
+                    'ClearNLPOutput path \'%s\' doesn\'t exist', clearnlp_dir)
+                return
         for part_id in os.listdir(clearnlp_dir):
             logger.info('Processing %s', part_id)
             inputdir = os.path.join(clearnlp_dir, part_id)
