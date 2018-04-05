@@ -1,0 +1,8 @@
+raise_issue
+demonstration
+meeting
+refused
+voted
+contact_party
+ignore
+bribe

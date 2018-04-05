@@ -1,0 +1,17 @@
+country
+urbrur
+region
+gender
+age
+race
+language
+tribe
+education
+religion
+imp_religion
+close_party
+which_party
+economy
+living_conditions
+livingcon_others
+
