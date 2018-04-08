@@ -51,7 +51,7 @@ def check_corenlp_file(prefix_path, filename, sen_id, content):
 
     # check whether word id matches
     node = s.basic_dependencies.get_node_by_idx(content['id'])
-    if not node or node.text != content['lemma']:
+    if not node or node.text != content['form']:
         return False
 
     return True
@@ -73,6 +73,7 @@ def parse_id():
                     continue
                 content = {
                     'id': int(line[0]),
+                    'form': line[1],
                     'lemma': line[2],
                 }
                 if content['id'] == 1:
