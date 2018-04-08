@@ -24,6 +24,7 @@ class Node(object):
         self.label = label # A dictionary containing 8 fields (optional)
         self.children = children
         self.parent = None
+        self.sem_relation = None
         
     def __str__(self):
         return '%s:%s'%(str(self.label['id']), self.label['form'])
@@ -31,12 +32,13 @@ class Node(object):
     def __eq__(self, n):
         return self.label['id'] == n.label['id']
         
-    def add_child(self, child):
+    def add_child(self, child, sem_relation = None):
         '''
         Adding a child to the current node.
         '''
         self.children.append(child)
         child.parent = self
+        child.sem_relation = sem_relation
         
     def find(self, field, value):
         '''

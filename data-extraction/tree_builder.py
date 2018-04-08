@@ -64,7 +64,7 @@ class TreeBuilder:
         # Exception handling, index out of bound.
         return []
     
-    def build_tree(self, sentence):
+    def build_tree(self, sentence, sem = False):
         '''
         Build tree from the current get_lines().
         
@@ -90,19 +90,22 @@ class TreeBuilder:
             _dict[int(fields[0])] = tree_util.Node(label=_label, children=[])
         
         # Connect nodes.
-        root = None
+        root_nodes = []
         for _, n in _dict.items():
-            if n.label['head'] != 0:
-                _dict[n.label['head']].add_child(n)
+            if sem:
+                if n.label['sheads'] == '_\n':
+                    root_nodes.append(n)
+                else:
+                    for part in n.label['sheads'].split(';'):
+                        parent, sem_relation = part.split(':')
+                        _dict[int(parent)].add_child(n, sem_relation)
             else:
-                root = n
-                
-            # if n.label['sheads'] == '_\n':
-            #     root_nodes.append(n)
-            #     continue
-            # parent = int(n.label['sheads'].split(':')[0])
+                if n.label['head'] != 0:
+                    _dict[n.label['head']].add_child(n)
+                else:
+                    root_nodes.append(n)
         
-        return [root]
+        return root_nodes
         
     
     # def build_from_config(self):
