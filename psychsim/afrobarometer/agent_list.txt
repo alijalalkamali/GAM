@@ -1,0 +1,6 @@
+resident
+government
+media
+party
+president
+army

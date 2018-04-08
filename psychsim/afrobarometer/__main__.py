@@ -25,11 +25,15 @@ class AfroWorldInitializer:
         agent_names = [line.rstrip('\n') for line in open(AGENT_PATH)]
         for agent_name in agent_names:
             agent = Agent(agent_name)
+            agent.setHorizon(1)
             self.world.addAgent(agent)
     
     def init_action(self):
         action_names = [line.rstrip('\n') for line in open(ACTION_PATH)]
         # bind actions to agents
+        for agent in self.world.agent.values():
+            for action_name in action_names:
+                agent.addAction({'verb': action_name})
         
         # set dynamics
     
