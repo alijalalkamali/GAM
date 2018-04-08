@@ -67,6 +67,7 @@ class Node(object):
     def rev_find_list(self, field, value_list):
         '''
         Find the nodes from bottom to top
+        (TODO: fix inconsistent return type with find_list.)
         '''
         if not self.parent:
             return None

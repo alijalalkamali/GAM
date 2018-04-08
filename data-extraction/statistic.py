@@ -16,6 +16,7 @@ class CoocurrenceCounter:
         self.negative_list = file_util.file_loader(neg_stative_path)
         state_path = 'data/params/state.txt'
         self.state_list = file_util.file_loader(state_path)
+        self.total_item_count = 0
     
     def count(self, state, action, stative_verb):
         self.actions.add(action)
@@ -23,6 +24,7 @@ class CoocurrenceCounter:
             self.positive_count[action][state] += 1
         else:
             self.negative_count[action][state] += 1
+        self.total_item_count += 1
         
     def is_positive(self, stative_verb):
         return stative_verb not in self.negative_list
@@ -53,11 +55,11 @@ def main():
     parser.add_argument(
         '--inputdir', '-i', required=True, help='input extracted data')
     parser.add_argument(
-        '--outputdir', '-o', default='outputs', help='directory for output')
+        '--outputdir', '-o', help='directory for output')
 
     args = parser.parse_args()
     input_dir = args.inputdir.rstrip('/')
-    output_dir = args.outputdir
+    output_dir = input_dir if not args.outputdir else args.outputdir
     outputname = 'summary.txt'
 
     if not os.path.isdir(input_dir):
@@ -77,7 +79,9 @@ def main():
                 tokens = line.strip().split(',')
                 counter.count(tokens[4], tokens[3], tokens[5])
     
-    outpath = os.path.join(output_dir, outputname)         
+    outpath = os.path.join(output_dir, outputname)
+    logger.info(
+        'Total items: %d', counter.total_item_count)
     with open(outpath, 'w+') as fp:
 
         for line in counter.generate_report():
