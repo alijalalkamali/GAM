@@ -15,7 +15,7 @@ from psychsim.reward import *
 from psychsim.world import *
 from psychsim.agent import Agent
 
-import psychsim.ui.diagram as diagram
+# import psychsim.ui.diagram as diagram
 
 # Statements about a resident's beliefs
 beliefs = {
@@ -173,17 +173,17 @@ def noisyOr(onCount,onProb,leak=0.):
 
 if __name__ == '__main__':
     world = World()
-    world.diagram = diagram.Diagram()
-    world.diagram.setColor(None,'ivory')
+    # world.diagram = diagram.Diagram()
+    # world.diagram.setColor(None,'ivory')
 
     resident = Agent('resident')
-    world.diagram.setColor(resident.name,'palegreen')
+    # world.diagram.setColor(resident.name,'palegreen')
     world.addAgent(resident)
 #    family = Agent('family')
 #    world.diagram.setColor(family.name,'mediumseagreen')
 #    world.addAgent(family)
     gov = Agent('government')
-    world.diagram.setColor(gov.name,'cornflowerblue')
+    # world.diagram.setColor(gov.name,'cornflowerblue')
     world.addAgent(gov)
 
     world.setOrder([resident.name])
@@ -261,7 +261,7 @@ if __name__ == '__main__':
         for option in [o for o in resident.actions if o != options['leave']]:
             # How many actions contribute to this objective?
             count = {True: 0, False: 0, None: 0}
-            total = len(objective['actions'])
+            total = len(objective['actions'])  # ?
             if len(option) == 0:
                 count[None] += 1
             else:
@@ -308,12 +308,16 @@ if __name__ == '__main__':
     for tree,weight in resident.getAttribute('R').items():
         print weight,tree
     decision = Distribution()
-    for vector in world.state[None].domain():
-        world.printVector(vector)
-        result = resident.decide(vector,selection='distribution')
-        for action in result['action'].domain():
-            decision.addProb(action,world.state[None][vector]*result['action'][action])
-            print 'Choice:',action
-            outcome = world.stepFromState(vector,action)
-            world.printState(outcome['new'])
-    print decision
+    result = world.step()
+    
+    # for vector in world.state[None].domain():
+    #     world.printVector(vector)
+    #     result = resident.decide(vector,selection='distribution')
+    #     for action in result['action'].domain():
+    #         decision.addProb(action,world.state[None][vector]*result['action'][action])
+    #         print 'Choice:',action
+    #         outcome = world.stepFromState(vector,action)
+    #         world.printState(outcome['new'])
+    # print decision
+    print ''
+    world.explain(result, 3)

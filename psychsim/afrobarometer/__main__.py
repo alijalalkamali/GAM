@@ -28,9 +28,9 @@ class AfroWorldInitializer:
         r1 = Agent('resident1')
         r1.setHorizon(1)
         self.world.addAgent(r1)
-        r2 = Agent('resident2')
-        r2.setHorizon(1)
-        self.world.addAgent(r2)
+        # r2 = Agent('resident2')
+        # r2.setHorizon(1)
+        # self.world.addAgent(r2)
     
     def init_action(self):
         # bind actions to agents
@@ -43,7 +43,7 @@ class AfroWorldInitializer:
                 tree = makeTree({'distribution':[
                     (incrementMatrix(stateKey(agent.name, state), 10),
                      prob_increase),
-                    (incrementMatrix(stateKey(agent.name, state), 10),
+                    (incrementMatrix(stateKey(agent.name, state), -10),
                      prob_decrease)
                     ]})
                 self.world.setDynamics(stateKey(agent.name, state), action, tree)
@@ -60,11 +60,11 @@ class AfroWorldInitializer:
                 
     def set_reward(self):
         for agent in self.world.agents.values():
-            agent.setReward(maximizeFeature('economy'))
+            agent.setReward(maximizeFeature(stateKey(agent.name, 'economy')), 0.1)
 
 if __name__ == '__main__':
     world = World()
     awi = AfroWorldInitializer(world)
     world.setOrder(world.agents.keys())
     result = world.step()
-    print(result)
+    world.explain(result, 4)

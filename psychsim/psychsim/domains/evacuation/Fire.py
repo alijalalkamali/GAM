@@ -6,6 +6,7 @@ from psychsim.pwl import *
 from psychsim.action import Action,ActionSet
 from psychsim.world import World,stateKey,actionKey
 from psychsim.agent import Agent
+from psychsim.reward import *
 
 
 
@@ -70,9 +71,9 @@ if __name__ == '__main__':
             goal = minimizeFeature(stateKey(me.name,'closest_dist'))
             me.setReward(goal,rewardWeights[base]['follow'])
             # Parameters
-            me.setHorizon(1)
-            # me.setParameter('discount',0.9)
-            me.setParameter('discount',0.2)
+            me.setHorizon(2)
+            # me.setAttribute('discount',0.9)
+            me.setAttribute('discount',0.2)
 
     # Turn order: Uncomment the following if you want agents to act in parallel
 
@@ -90,15 +91,15 @@ if __name__ == '__main__':
     for agt in actors:
         atom = Action({'subject': agt,'verb': 'runAway', 'object':'fire'})
         tree = makeTree(incrementMatrix(stateKey(atom['subject'],'fire_dist'),.1))
-        world.setDynamics(agt,'fire_dist',atom,tree)
+        world.setDynamics(stateKey(agt,'fire_dist'),atom,tree)
 
         atom = Action({'subject': agt,'verb': 'runTowards', 'object':'door'})
         tree = makeTree(incrementMatrix(stateKey(atom['subject'],'door_dist'),-.1))
-        world.setDynamics(agt,'door_dist',atom,tree)
+        world.setDynamics(stateKey(agt,'door_dist'),atom,tree)
 
-        atom = Action({'subject': agt,'verb': 'runClosest'})
+        atom = Action({'subject': agt,'verb': 'followClosest'})
         tree = makeTree(incrementMatrix(stateKey(atom['subject'],'closest_dist'),-.1))
-        world.setDynamics(agt,'door_dist',atom,tree)
+        world.setDynamics(stateKey(agt,'door_dist'),atom,tree)
 
     
     # Save scenario to compressed XML file
@@ -114,12 +115,12 @@ if __name__ == '__main__':
     world = World('default.psy')
     # world.printState()
     
-    for t in range(7):
-        print 'next:',world.next(world.state.expectation())
+    for t in range(2):
+        print 'next:',world.next()
         world.explain(world.step(),0)
         # world.explain()
         # print world.step()
-        world.state.select()
+        # world.state.select()
 
     world.printState()
 
