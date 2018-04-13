@@ -6,6 +6,7 @@ from psychsim.agent import *
 
 import pandas as pd
 
+import argparse
 
 class GAMWorldStateInitializer:
     def __init__(self, Coocurrances, World, agents):
@@ -90,70 +91,84 @@ class GAMWorldStateInitializer:
             else:
                 print "Cannot set reward condition"
 
-
-# Read In Coocurrance file
-cooc = pd.read_csv("CooccuranceOutput2013.csv")
-
-# Create World
-world = World()
-
-# Create Agents
-a1 = Agent("A1")
-a1.setHorizon(3)
-a2 = Agent("A2")
-a2.setHorizon(3)
-
-# Add agents to world
-world.addAgent(a1)
-world.addAgent(a2)
-
-# Set Goal for each agent to mazimize state "positive" variables and minimize "negative" variables
-# vars should have positive and negative tags and weights in input document
-# some vars are neutral?
-pos_vars_weights = {'force': 1.0, 'cooperation': 1.0, 'welfare': 1.0, 'military': 1.0, 'economy': 1.0, 'trade': 1.0}
-neg_vars_weights = {'price': 1.0, 'tension': 1.0}
-
-gwsi = GAMWorldStateInitializer(cooc, world, [a1, a2])
-print gwsi.states
-print gwsi.action_probabilities
-gwsi.setStates()
-gwsi.createActions(pos_vars_weights=pos_vars_weights, neg_vars_weights=neg_vars_weights)
-
-# Run Simulation for X number of steps
-print "Start Simulation"
-world.setOrder(world.agents.keys())
-
-# Set Termination Conditions
-gwsi.setTerminationCondition("economy", 90)  # economy decreases by 10 %
-gwsi.setTerminationCondition("economy", 110)  # OR economy increases by 10%
-gwsi.setTerminationCondition("tension", 90)  # tension decreases by 10 %
-gwsi.setTerminationCondition("tension", 110)  # OR tension increases by 10%
-
-# Set Rewards
-gwsi.setRewardCondition("max", "economy")
-gwsi.setRewardCondition("min", "tension")
-
-while not world.terminated():
-    result = world.step()
-    world.explain(result, 1)
-    world.explain(result, 2)
-    world.explain(result, 3)
-    world.explain(result, 4)
-    world.explain(result, 5)
+    # Set weights for states
+    def setWeights(self):
+        # TO DO:
+        return None
 
 
-# How to encode the following "Reward Functions"?
-# Fragile State Index
-    # detect for economic decline
-    # detect for increase in tension
-    # detect for decrease in cooperation
-    # detect for increase in force
-# Conflict database (diplomacy)
-    # detect for increase in military
-    # detect for increase in force
-# Economy (GDP)
-    # detect for changes in economy, trade, welfare,
-    # price?
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--cf', help="Coocurrance File", required=True)
+    parser.add_argument('-a', help="Number of Agents", default=2)
+    parser.add_argument('-h', help="Horizon", default=3)
+    args = parser.parse_args()
+
+    # Read In Coocurrance file
+    #cooc = pd.read_csv("CooccuranceOutput2013.csv")
+    cooc = pd.read_csv(args.cf)
+
+    # Create World
+    world = World()
+
+    # agents = []
+    # # Create Agents
+    # for i in range(1, int(args.a) + 1):
+    #     agent_name = "A" + str(i)
+    #     agent = Agent(agent_name)
+    #     agent.setHorizon(args.h)
+    #     agents.append(agent)
+    #     world.addAgent(agent)
+
+    a1 = Agent("A1")
+    a1.setHorizon(3)
+    a2 = Agent("A2")
+    a2.setHorizon(3)
+
+    # Add agents to world
+    world.addAgent(a1)
+    world.addAgent(a2)
+
+    # TODO: set weights with function that user can interface with
+    # Set Goal for each agent to mazimize state "positive" variables and minimize "negative" variables
+    # vars should have positive and negative tags and weights in input document
+    # some vars are neutral?
+    pos_vars_weights = {'force': 1.0, 'cooperation': 1.0, 'welfare': 1.0, 'military': 1.0, 'economy': 1.0, 'trade': 1.0}
+    neg_vars_weights = {'price': 1.0, 'tension': 1.0}
+
+    gwsi = GAMWorldStateInitializer(cooc, world, [a1, a2])
+    print gwsi.states
+    print gwsi.action_probabilities
+    gwsi.setStates()
+    gwsi.createActions(pos_vars_weights=pos_vars_weights, neg_vars_weights=neg_vars_weights)
+
+    # Run Simulation for X number of steps
+    print "Start Simulation"
+    world.setOrder(world.agents.keys())
+
+    # TODO: set termination conditions with function that user can interface with
+    # Set Termination Conditions
+    gwsi.setTerminationCondition("economy", 90)  # economy decreases by 10 %
+    gwsi.setTerminationCondition("economy", 110)  # OR economy increases by 10%
+    gwsi.setTerminationCondition("tension", 90)  # tension decreases by 10 %
+    gwsi.setTerminationCondition("tension", 110)  # OR tension increases by 10%
+
+    # Set Rewards
+    gwsi.setRewardCondition("max", "economy")
+    gwsi.setRewardCondition("min", "tension")
+
+    step = 0
+    while not world.terminated():
+        result = world.step()
+        world.explain(result, 1)
+        world.explain(result, 2)
+        world.explain(result, 3)
+        world.explain(result, 4)
+        world.explain(result, 5)
+        step = step + 1
+        if step == 50:
+            break
 
 
 

@@ -1,0 +1,14 @@
+X,force,cooperation,welfare,military,tie,economy,gdp,tension,trade,Total Count
+echo,,,,,,100-0,,,,2
+mark,,,,,,,,100-0,,2
+pass,,,,,,100-0,,,,1
+grow,,,,,,100-0,100-0,,,2
+project,,,,,,100-0,,,,1
+surge,,,,,,100-0,,,,1
+be,,,,,,100-0,,,100-0,5
+say,,,,,100-0,100-0,,,,9
+reiterate,,,,,100-0,,,,,1
+note,,100-0,,,,,,,,1
+continue,,,,,,,,100-0,,1
+attack,100-0,,,,,,,,,1
+formulate,,,,,,,,,100-0,1
