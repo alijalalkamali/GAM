@@ -28,9 +28,9 @@ class AfroWorldInitializer:
         r1 = Agent('resident1')
         r1.setHorizon(1)
         self.world.addAgent(r1)
-        # r2 = Agent('resident2')
-        # r2.setHorizon(1)
-        # self.world.addAgent(r2)
+        r2 = Agent('resident2')
+        r2.setHorizon(1)
+        self.world.addAgent(r2)
     
     def init_action(self):
         # bind actions to agents
@@ -40,12 +40,19 @@ class AfroWorldInitializer:
                 action = agent.addAction({'verb': action_name})
                 prob_increase = value[state]
                 prob_decrease = 1. - prob_increase
-                tree = makeTree({'distribution':[
-                    (incrementMatrix(stateKey(agent.name, state), 10),
-                     prob_increase),
-                    (incrementMatrix(stateKey(agent.name, state), -10),
-                     prob_decrease)
-                    ]})
+                # Probablistic tree
+                # 
+                # tree = makeTree({'distribution':[
+                #     (incrementMatrix(stateKey(agent.name, state), 10),
+                #      prob_increase),
+                #     (incrementMatrix(stateKey(agent.name, state), -10),
+                #      prob_decrease)
+                #     ]})
+                
+                tree = makeTree(
+                    {'if':greaterThanRow(stateKey(agent.name, 'trust'),50)
+                    (stateKey(agent.name, state),
+                    100*(prob_increase-0.5)))
                 self.world.setDynamics(stateKey(agent.name, state), action, tree)
         
         # set dynamics
@@ -67,4 +74,4 @@ if __name__ == '__main__':
     awi = AfroWorldInitializer(world)
     world.setOrder(world.agents.keys())
     result = world.step()
-    world.explain(result, 4)
+    world.explain(result, 5)
