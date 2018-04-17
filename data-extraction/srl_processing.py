@@ -194,7 +194,11 @@ class SrlProcessor:
             for line in f:
                 filename, sen_id, w_id, word = tuple(line.strip().split(','))
                 logger.info('processing '+filename)
-                ret = self.process_sentence(filename, int(sen_id), int(w_id))
+                try:
+                    ret = self.process_sentence(filename, int(sen_id), int(w_id))
+                except IndexError:
+                    logger.warning('Word with specific ID not found')
+                    continue
                 if ret:
                     yield (filename,) + ret
         
