@@ -35,4 +35,7 @@ objectives = {
 }
 
 # states = ['economy', 'education']
-states = ['economy', 'education', 'living_condition', 'safety', 'trust']
+# states = ['economy', 'education', 'living_condition', 'safety',
+#           'trust', 'close2party']
+          
+states = {'close2party':50, 'economy':50}
