@@ -2,6 +2,7 @@
 Basic implementation of SRL processing tasks discussed on Feb 16.
 '''
 
+import file_util
 import logging
 import tree_builder
 import os.path
@@ -12,15 +13,20 @@ logger = logging.getLogger(__name__)
 
 class SrlProcessor:
     def __init__(self):
-        self.stative_path = 'data/params/stativewords.txt'
-        self.stative_verb_list = self.file_loader(self.stative_path)
-        self.actor_path = 'data/params/country_nationality.txt'
-        self.actor_list = self.get_country_list(self.actor_path)
+        stative_path = 'data/params/stativewords.txt'
+        self.stative_verb_list = file_util.file_loader(stative_path)
+        actor_path = 'data/params/country_nationality.txt'
+        self.actor_list = self.get_country_list(actor_path)
         
         # self.states_path = 'params/states.txt'
         # self.base_forms = self.file_loader(self.states_path)
                 
         self.tb = tree_builder.TreeBuilder()
+        
+        # Summary
+        self.state_count = 0
+        self.stative_verb_count = 0
+        self.actor_count = 0
         
     def get_country_list(self, country_list_file):
         country_list = {}
@@ -32,16 +38,6 @@ class SrlProcessor:
                     for country in line:
                         country_list[country] = _country
         return country_list
-    
-    def file_loader(self, filename, col=0):
-        '''
-        Read certain coloumn from text file.
-        '''
-        with open(filename) as fp:
-            ret = fp.readlines()
-            ret = [line.split()[col] for line in ret]
-            return ret
-        return None
 
     
     def process_sentence(self, filename, sen_id, w_id):
@@ -58,105 +54,130 @@ class SrlProcessor:
                       Here should have possesive pronoun is the direct child 
         '''
         actor, actor_is_dc = '_', '_'
-        action_verb, state, stative_verb, possesive_pronoun = '_', '_', '_', '_'
+        action_verb, state, stative_verb, possesive_pronoun = '_', '_', '~', '_'
         possesive_pronoun_reso = '_'
         
-        
-        srl_filename = 'data/ClearnlpOutput/%s.txt.srl'%filename
-        corenlp_filename = 'data/CorenlpOutput/%s.xml'%filename
-        # self.tb.filename = srl_filename
+        prefix_name = os.path.join(*(filename.split('/')[:-2]))
+        part_name = os.path.join(*(filename.split('/')[-2:]))
+        srl_filename = os.path.join(
+            prefix_name, 'ClearNLPOutput', '%s.txt.srl'%part_name)
+        corenlp_filename = os.path.join(
+            prefix_name, 'CoreNLPOutput', '%s.xml'%part_name)
+
         if not os.path.isfile(srl_filename):
-            logger.info('%s file missing'%srl_filename)
-            return
+            srl_filename = os.path.join(
+                prefix_name, 'ClearnlpOutput', '%s.txt.srl'%part_name)
+            if not os.path.isfile(srl_filename):
+                logger.info('%s file missing'%srl_filename)
+                return
         if not os.path.isfile(corenlp_filename):
             logger.info('%s file missing'%corenlp_filename)
             return
         
         sen = self.tb.get_ith_sentence_from_file(srl_filename, sen_id)
 
-        root_nodes = self.tb.build_tree(sen)
+        sem_root_nodes = self.tb.build_tree(sen, sem = True)
         
+        sem_state_node = None
         # In case there are multiple roots.
-        for root_node in root_nodes:
+        for sem_root_node in sem_root_nodes:
             # Finding state node by provided word id
-            state_node = root_node.find('id', w_id)
-            if not state_node:
-                logger.info('no state found in sentence:%d root:%s'%(
-                    sen_id, root_node.label['form']))
-                # Continue to find the id in next root node.
+            sem_state_nodes = sem_root_node.find('id', w_id)
+            if sem_state_nodes:
+                sem_state_node = sem_state_nodes[0]
+                break
+            # Continue to find the id in next root node.
+            
+        if not sem_state_node:
+            logger.warning('no state found in sentence:%d root:%s'%(
+                sen_id, sem_root_node.label['form']))
+            return None
+            
+        state = sem_state_node.label['lemma']
+        self.state_count += 1
+        logger.debug('state:%s'%str(state))
+        
+        # lemma here instead of form
+        sem_stative_verb_node = sem_state_node.rev_find_list(
+            'lemma', self.stative_verb_list) 
+            
+        if not sem_stative_verb_node:
+            logger.debug('no stative verb found in %d'%sen_id)
+            return None
+        
+        stative_verb = sem_stative_verb_node.label['lemma']
+        self.stative_verb_count += 1
+        logger.debug('stative verb:%s'%str(stative_verb))
+        
+        # Build dependency tree.
+        root_node = self.tb.build_tree(sen)[0]
+        state_node = root_node.find('id', w_id)[0]
+        stative_verb_node = root_node.find(
+            'id', sem_stative_verb_node.label['id'])[0]
+        # Change find to direct children
+        possesive_pronoun_nodes = state_node.find('deprel', 'poss')
+        # Not checking if actor is from state's subtree.
+        actor_nodes = root_node.find_list('form', self.actor_list.keys())
+        if not actor_nodes and not possesive_pronoun_nodes:
+            return None
+        
+        # Either actor or possesive pronoun is found.
+        # But coreference may not be solved.
+
+        actors = [n.label['form'] for n in actor_nodes]
+        actors_is_dc = []
+                    
+        if not possesive_pronoun_nodes:
+            logger.debug('no possesive pronoun found in %d'%sen_id)
+            # find actor directly.
+            
+            
+        else:
+            possesive_pronoun = possesive_pronoun_nodes[0].label['form']
+            logger.info('possesive pronoun found in %d: %d, first is %s'%(
+                sen_id,
+                len(possesive_pronoun_nodes),
+                possesive_pronoun))
+            
+            # find actor through corenlp.
+            f = open(corenlp_filename, 'rb')
+            xml_string = f.read()
+            f.close()
+            doc = Document(xml_string)
+            
+            for possesive_pronoun_node in possesive_pronoun_nodes:
+                possesive_pronoun_id = possesive_pronoun_node.label['id']
+                if doc.coreferences:
+                    for coref in doc.coreferences:
+                        isFound = False
+                        _actor = None
+                        for mention in coref.mentions:
+                            _sen_id = mention.sentence.id
+                            _w_id = mention.head.id
+                            if sen_id == _sen_id and _w_id == possesive_pronoun_id:
+                                isFound = True
+                            if not _actor and  mention.text in self.actor_list:
+                                _actor = self.actor_list[mention.text]
+
+                        if isFound and _actor:
+                            possesive_pronoun_reso = _actor
+                            actors.append(_actor)
+                            actor_nodes.append(possesive_pronoun_node)
+        if actor_nodes:
+            self.actor_count += 1
+        for n1 in actor_nodes:
+            if stative_verb_node.is_parent(n1):
+                actors_is_dc.append('1')
             else:
-                state = state_node[0].label['form']
-                logger.info('state:%s'%str(state))
-                
-                # lemma here instead of form
-                stative_verb_nodes = root_node.find_list(
-                    'lemma', self.stative_verb_list) 
-                # import pdb; pdb.set_trace()
-                if not stative_verb_nodes:
-                    logger.info('no stative verb found in %d'%sen_id)
-                else:
-                    stative_verbs = [n.label['form'] for n in stative_verb_nodes]
-                    stative_verb = ','.join(stative_verbs)
-                    logger.info('stative verbs:%s'%str(stative_verbs))
-                    
-                    # Change find to direct children
-                    possesive_pronoun_nodes = state_node[0].find('deprel', 'poss')
-                    # Not checking if actor is from state's subtree.
-                    actor_nodes = root_node.find_list('form', self.actor_list.keys())
-                    if not actor_nodes:
-                        return None
-                    actors = [n.label['form'] for n in actor_nodes]
-                    actors_is_dc = []
-                    for n1 in actor_nodes:
-                        for n2 in stative_verb_nodes:
-                            if n2.is_direct_parent(n1):
-                                actors_is_dc.append('1')
-                                break
-                        else:
-                            actors_is_dc.append('0')
-                                
-                    if not possesive_pronoun_nodes:
-                        logger.info('no possesive pronoun found in %d'%sen_id)
-                        # find actor directly.
-                        
-                        
-                    else:
-                        possesive_pronoun = possesive_pronoun_nodes[0]
-                        logger.info('possesive pronoun found in %d: %d, first is %s'%(
-                            sen_id,
-                            len(possesive_pronoun_nodes),
-                            possesive_pronoun))
-                        
-                        # find actor through corenlp.
-                        actors = []
-                        f = open(corenlp_filename, 'rb')
-                        xml_string = f.read()
-                        f.close()
-                        doc = Document(xml_string)
-
-                        possesive_pronoun_id = possesive_pronoun_nodes[0].label['id']
-                        # import pdb; pdb.set_trace()
-                        for coref in doc.coreferences:
-                            isFound = False
-                            _actor = None
-                            for mention in coref.mentions:
-                                _sen_id = mention.sentence.id
-                                _w_id = mention.head.id
-                                if sen_id == _sen_id and _w_id == possesive_pronoun_id:
-                                    isFound = True
-                                if not _actor and  mention.text in self.actor_list:
-                                    _actor = self.actor_list[mention.text]
-
-                            if isFound and _actor:
-                                actors.append(_actor)
-                    
-                    # find action verb
-                    action_verb = ''
-                    
-                    return (','.join(actors), ','.join(actors_is_dc),
-                            action_verb, state, stative_verbs,
-                            possesive_pronoun, possesive_pronoun_reso)
-
+                actors_is_dc.append('0')                
+        
+        # by default action verb is the root
+        action_verb = root_node.label['lemma']
+        
+        return (';'.join(actors), ';'.join(actors_is_dc),
+                action_verb, state, stative_verb,
+                # possesive_pronoun, possesive_pronoun_reso
+                )
 
     def process_list(self, list_filename):
         '''
@@ -172,10 +193,10 @@ class SrlProcessor:
             
             for line in f:
                 filename, sen_id, w_id, word = tuple(line.strip().split(','))
-                # (TODO: Make unified directory resolution.)
-                filename = '%s'%filename
                 logger.info('processing '+filename)
-                yield self.process_sentence(filename, int(sen_id), int(w_id))
+                ret = self.process_sentence(filename, int(sen_id), int(w_id))
+                if ret:
+                    yield (filename,) + ret
         
 
 def main():

@@ -4,4 +4,4 @@
 # Example:
 # bash filter.sh ClearnlpOutput/Part1
 
-bash word_filter.sh $1 | python file_filter.py 
+bash word_filter.sh $1 | python3 file_filter.py

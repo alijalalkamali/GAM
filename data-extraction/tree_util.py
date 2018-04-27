@@ -23,15 +23,22 @@ class Node(object):
         '''
         self.label = label # A dictionary containing 8 fields (optional)
         self.children = children
+        self.parent = None
+        self.sem_relation = None
         
     def __str__(self):
         return '%s:%s'%(str(self.label['id']), self.label['form'])
         
-    def add_child(self, child):
+    def __eq__(self, n):
+        return self.label['id'] == n.label['id']
+        
+    def add_child(self, child, sem_relation = None):
         '''
         Adding a child to the current node.
         '''
         self.children.append(child)
+        child.parent = self
+        child.sem_relation = sem_relation
         
     def find(self, field, value):
         '''
@@ -45,7 +52,6 @@ class Node(object):
             ret+=child.find(field, value)
         return ret
         
-        
     def find_list(self, field, value_list):
         '''
         Find the nodes that have certain field's value equal to one of
@@ -57,18 +63,31 @@ class Node(object):
         for child in self.children:
             ret+=child.find_list(field, value_list)
         return ret
-    
-    def del_child(self, field, value):
-        for i, child in enumerate(self.children):
-            if child.label.get(field) == value:
-                del self.children[i]
-                return
+        
+    def rev_find_list(self, field, value_list):
+        '''
+        Find the nodes from bottom to top
+        (TODO: fix inconsistent return type with find_list.)
+        '''
+        if not self.parent:
+            return None
+        if self.parent.label.get(field) in value_list:
+            return self.parent
+        else:
+            return self.parent.rev_find_list(field, value_list)
             
     def is_direct_parent(self, node):
         for child in self.children:
-            if id(child) == id(self):
+            if child == self:
                 return True
         return False
+        
+    def is_parent(self, node):
+        if not node.parent:
+            return False
+        if node.parent == self:
+            return True
+        return self.is_parent(node.parent)
 
 
 # def search_lemmas(node, lemmas):
