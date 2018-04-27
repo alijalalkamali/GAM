@@ -3,6 +3,7 @@ from psychsim.reward import *
 from psychsim.action import *
 from psychsim.world import *
 from psychsim.agent import *
+import cmd
 
 import pandas as pd
 
@@ -33,7 +34,7 @@ class GAMWorldStateInitializer:
                     self.world.setState(a.name, i, stateDefaults[i])
                 else:
                     self.world.setState(a.name, i, 100)
-                print a.name + " " + str(i) + " " + str(self.world.getState(a1.name, i))
+                print a.name + " " + str(i) + " " + str(self.world.getState(a.name, i))
 
     def getActionProbabilities(self):
         action_probabilities = {}
@@ -79,6 +80,31 @@ class GAMWorldStateInitializer:
                              True: True, False: False})
             self.world.addTermination(tree)
 
+    # Prompts User to Set Termination Conditions
+    def getTerminationConditions(self):
+        setting_conditions = raw_input("Y to set termination conditions.  To skip, press any other key. ")
+        if setting_conditions == "Y":
+            while setting_conditions == "Y":
+                print self.states
+                goal_state = ""
+                while goal_state not in self.states:
+                    goal_state = raw_input("Select State: ")
+                    if goal_state in self.states:
+                        break
+                    print "Not a valid state"
+
+                end_value = None
+                while end_value is None:
+                    end_value = raw_input("Set Termination State Value: ")
+                    if not end_value[0].isalpha():
+                        end_value = int(end_value)
+                        break
+                    print "Not a valid target value"
+
+                print "Setting Termination Condition: if {state} reaches value of {target}".format(state=goal_state, target=end_value)
+                self.setTerminationCondition(goal_state, end_value)
+                setting_conditions = raw_input("Y to set more termination conditions.  To continue, press any other key. ")
+
     # Currently set same reward for all agents
     def setRewardCondition(self, rewardType, reward_state1, reward_state2=None):
         for a in self.agents:
@@ -91,84 +117,148 @@ class GAMWorldStateInitializer:
             else:
                 print "Cannot set reward condition"
 
+    # Prompts User to Set Reward Conditions
+    def getRewardCondition(self):
+        setting_conditions = raw_input("Y to set reward conditions.  To skip, press any other key. ")
+        if setting_conditions == "Y":
+            while setting_conditions == "Y":
+                print self.states
+                goal_state = ""
+                while goal_state not in self.states:
+                    goal_state = raw_input("Select Goal State: ")
+                    if goal_state in self.states:
+                        break
+                    print "Not a valid state"
+
+                min_max = None
+                while min_max is None:
+                    min_max = raw_input("Minimize(1), Maximize(2), or Minimize Difference(3)?: ")
+                    if not min_max[0].isalpha():
+                        min_max = int(min_max)
+                        if min_max == 1:
+                            min_max = "min"
+                            break
+                        elif min_max == 2:
+                            min_max = "max"
+                            break
+                        elif min_max == 3:
+                            min_max = "minDifference"
+                            break
+                        else:
+                            pass
+                    print "Not a valid target value"
+
+                goal_state2 = None
+                if min_max == "minDifference":
+                    print self.states
+                    goal_state2 = ""
+                    while goal_state2 not in self.states:
+                        goal_state2 = raw_input("Select State to Minimize difference with {state}: ".format(state=goal_state))
+                        if goal_state2 in self.states:
+                            break
+                        print "Not a valid state"
+
+                print "Setting Reward Condition"
+                self.setRewardCondition(min_max, goal_state, reward_state2=goal_state2)
+                setting_conditions = raw_input("Y to set more reward conditions.  To continue, press any other key. ")
+
     # Set weights for states
     def setWeights(self):
-        # TO DO:
-        return None
-
+        set_weights = raw_input("Y to set weights. To skip, press any other key. ")
+        pos_vars_weights = {}
+        neg_vars_weights = {}
+        if set_weights != "Y":
+            for state in self.states:
+                pos_vars_weights[state] = 1
+        else:
+            i = 0
+            while i < len(self.states):
+                state_weight = raw_input("Set weight for {state}: ".format(state=self.states[i]))
+                if not state_weight.isalpha():
+                    state_weight = int(state_weight)
+                    if state_weight < 0:
+                        neg_vars_weights[self.states[i]] = state_weight
+                    else:
+                        pos_vars_weights[self.states[i]] = state_weight
+                    i = i + 1
+                else:
+                    print "Weight for state variable must be an integer"
+        return pos_vars_weights, neg_vars_weights
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--cf', help="Coocurrance File", required=True)
     parser.add_argument('-a', help="Number of Agents", default=2)
-    parser.add_argument('-h', help="Horizon", default=3)
+    parser.add_argument('--ho', help="Horizon", default=3)
+    parser.add_argument('-v', help="Verbose", default=False)
     args = parser.parse_args()
 
     # Read In Coocurrance file
-    #cooc = pd.read_csv("CooccuranceOutput2013.csv")
     cooc = pd.read_csv(args.cf)
 
     # Create World
+    print "Creating World"
     world = World()
 
-    # agents = []
-    # # Create Agents
-    # for i in range(1, int(args.a) + 1):
-    #     agent_name = "A" + str(i)
-    #     agent = Agent(agent_name)
-    #     agent.setHorizon(args.h)
-    #     agents.append(agent)
-    #     world.addAgent(agent)
+    # Create Agents
+    print "Creating Agents"
+    agents = []
+    for i in range(1, int(args.a) + 1):
+        agent_name = "A" + str(i)
+        print "Creating Agent: {agent}".format(agent=agent_name)
+        agent = Agent(agent_name)
+        agent.setHorizon(args.ho)
+        agents.append(agent)
+        print "Adding Agent to World"
+        world.addAgent(agent)
 
-    a1 = Agent("A1")
-    a1.setHorizon(3)
-    a2 = Agent("A2")
-    a2.setHorizon(3)
+    gwsi = GAMWorldStateInitializer(cooc, world, agents)
 
-    # Add agents to world
-    world.addAgent(a1)
-    world.addAgent(a2)
-
-    # TODO: set weights with function that user can interface with
+    print "Set Weights to Prioritize States"
     # Set Goal for each agent to mazimize state "positive" variables and minimize "negative" variables
     # vars should have positive and negative tags and weights in input document
     # some vars are neutral?
-    pos_vars_weights = {'force': 1.0, 'cooperation': 1.0, 'welfare': 1.0, 'military': 1.0, 'economy': 1.0, 'trade': 1.0}
-    neg_vars_weights = {'price': 1.0, 'tension': 1.0}
+    # pos_vars_weights = {'force': 1.0, 'cooperation': 1.0, 'welfare': 1.0, 'military': 1.0, 'economy': 1.0, 'trade': 1.0}
+    # neg_vars_weights = {'price': 1.0, 'tension': 1.0}
 
-    gwsi = GAMWorldStateInitializer(cooc, world, [a1, a2])
-    print gwsi.states
-    print gwsi.action_probabilities
+    pos_var_weights, neg_var_weights = gwsi.setWeights()
+    if args.v:
+        print gwsi.states
+        print gwsi.action_probabilities
     gwsi.setStates()
-    gwsi.createActions(pos_vars_weights=pos_vars_weights, neg_vars_weights=neg_vars_weights)
+    gwsi.createActions(pos_vars_weights=pos_var_weights, neg_vars_weights=neg_var_weights)
+
+    # Set Termination Conditions
+    print "Set Termination Conditions"
+    gwsi.getTerminationConditions()
+    # gwsi.setTerminationCondition("economy", 90)  # economy decreases by 10 %
+    # gwsi.setTerminationCondition("economy", 110)  # OR economy increases by 10%
+    # gwsi.setTerminationCondition("tension", 90)  # tension decreases by 10 %
+    # gwsi.setTerminationCondition("tension", 110)  # OR tension increases by 10%
+
+    # Set Rewards
+    print "Set Reward Conditions"
+    gwsi.getRewardCondition()
+    # gwsi.setRewardCondition("max", "economy")
+    # gwsi.setRewardCondition("minDifference", "tension", "trade")
 
     # Run Simulation for X number of steps
     print "Start Simulation"
     world.setOrder(world.agents.keys())
 
-    # TODO: set termination conditions with function that user can interface with
-    # Set Termination Conditions
-    gwsi.setTerminationCondition("economy", 90)  # economy decreases by 10 %
-    gwsi.setTerminationCondition("economy", 110)  # OR economy increases by 10%
-    gwsi.setTerminationCondition("tension", 90)  # tension decreases by 10 %
-    gwsi.setTerminationCondition("tension", 110)  # OR tension increases by 10%
-
-    # Set Rewards
-    gwsi.setRewardCondition("max", "economy")
-    gwsi.setRewardCondition("min", "tension")
-
     step = 0
     while not world.terminated():
         result = world.step()
         world.explain(result, 1)
-        world.explain(result, 2)
-        world.explain(result, 3)
-        world.explain(result, 4)
-        world.explain(result, 5)
+        # world.explain(result, 2)
+        # world.explain(result, 3)
+        # world.explain(result, 4)
+        # world.explain(result, 5)
         step = step + 1
         if step == 50:
             break
+
 
 
 
