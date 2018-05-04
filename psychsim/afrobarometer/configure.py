@@ -1,3 +1,6 @@
+lookup_states = {296: {'name':'close2party', 'type':int}}
+preset_states = {'economy': {'type':int, 'val':50}}
+
 actions_trust = {
     'refuse tax': \
         {'economy': 0.7,
@@ -37,5 +40,3 @@ objectives = {
 # states = ['economy', 'education']
 # states = ['economy', 'education', 'living_condition', 'safety',
 #           'trust', 'close2party']
-          
-states = {'close2party':50, 'economy':50}
