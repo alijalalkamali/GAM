@@ -62,5 +62,9 @@ A2-allow
 ...
 ```
 
+### Next Steps
 
-
+- Create functionality to weight states by count of action verbs
+	- e.g. The count of the instances of 'negotiate' will determine weight of the 'diplomacy' state
+- Use Coocurrance script to run multiple simulations and record output
+- Distinguish owner of state from extracted data and create functionality to adjust parameters for different agents
