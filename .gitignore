@@ -1,0 +1,5 @@
+*/__pycache__
+data-extraction/data/
+!data-extraction/data/params/
+data-extraction/outputs/
+*.pyc

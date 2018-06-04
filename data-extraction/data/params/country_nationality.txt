@@ -1,0 +1,177 @@
+Afghanistan	Afghan	afghan
+Albania	Albanian	albanian
+Algeria	Algerian	algerian
+Andorra	Andorran	andorran
+Angola	Angolan	angolan
+Argentina	Argentinian	argentinian
+Armenia	Armenian	armenian
+Australia	Australian	australian
+Austria	Austrian	austrian
+Azerbaijan	Azerbaijani	azerbaijani
+Bahamas	Bahamian	bahamian
+Bahrain	Bahraini	bahraini
+Bangladesh	Bangladeshi	bangladeshi
+Barbados	Barbadian	barbadian
+Belarus	Belarusian	belarusian
+Belgium	Belgian	belgian
+Belize	Belizean	belizean
+Benin	Bruneian	bruneian
+Bhutan	Bhutanese	bhutanese
+Bolivia	Bolivian	bolivian
+Bosnia Herzegovina	Bosnian	Bosnia and Herzegovina	bosnian
+Botswana	Batswana	batswana	Motswana	motswana
+Brazil	Brazilian	brazilian
+Brunei	Bruneian	bruneian
+Bulgaria	Bulgarian	bulgarian
+Burkina Faso	Burkinese	Burkina	burkinese	burkina
+Burma	Myanmar	Burmese	burmese	myanmar
+Burundi	Burundian	burundian
+Cambodia	Cambodian	cambodian
+Cameroon	Cameroonian	cameroonian
+Canada	Canadian	canadian
+Cape Verde
+Chad	Chadian	chadian
+Chile	Chilean	chilean
+China	Chinese	chinese
+Colombia	Colombian	colombian
+Democratic Republic of the Congo
+Republic of the Congo
+Costa Rica	Costa Rican
+Croatia	Croat	croat
+Cuba	Cuban	cuban
+Cyprus	Cypriot	cypriot
+Czech Republic	Czech	czech
+Denmark	Danish
+Djibouti	Djiboutian	djiboutian
+Dominican Republic  Dominican   dominican
+Dominica	Dominican
+Ecuador	Ecuadorean	ecuadorean
+Egypt	Egyptian	egyptian
+El Salvador	Salvadorean	salvadorean
+Eritrea	Eritrean	eritrean
+Estonia	Estonian	estonian
+Ethiopia	Ethiopian	ethiopian	ethiopians
+Fiji	Fijian	Fijian
+Finland	Finnish	finnish
+France	French	french
+Gabon	Gabonese	gabonese	Gabonaise	gabonaise
+Gambia	Gambian	gambian
+Georgia	Georgian	georgian
+Germany	German	german
+Ghana	Ghanaian	ghanaian
+Greece	Greek	greek
+Grenada	Grenadian	grenadian
+Guatemala	Guatemalan	guatemalan
+Papua New Guinea    Guinean guinean
+Guinea	Guinean	guinean
+Guyana	Guyanese	guyanese
+Haiti	Haitian	haitian
+Holland	Netherlands	Dutch	dutch
+Honduras	Honduran	honduran
+Hungary	Hungarian	hungarian
+Iceland	Icelander	icelander
+India	Indian	indian
+Indonesia	Indonesian	indonesian
+Iran	Persian	persian
+Iraq	Iraqi	iraqi
+Ireland	Irish	irish
+Italy	Vatican	Italian	italian
+Jamaica	Jamaican	jamaican
+Japan	Japanese	japanese
+Jordan	Jordanian	jordanian
+Kazakhstan	Kazakh	kazakh
+Kenya	Kenyan	kenyan
+Kuwait	Kuwaiti	kuwaiti
+Laos	Laotian	laotian
+Latvia	Latvian	latvian
+Lebanon	Lebanese	lebanese
+Liberia	Liberian	liberian
+Libya	Libyan	libyan
+Liechtenstein	Liechtensteiner	liechtensteiner
+Lithuania	Lithuanian	lithuanian
+Luxembourg	Luxembourgish	luxembourgish	Luxembourger	luxembourger
+Macedonia	Macedonian	macedonian
+Madagascar	Malagasy	Madagascan	malagasy	madagascan
+Malawi	Malawian	malawian
+Malaysia	Malaysian	malaysian
+Maldives	Maldivian	maldivian
+Mali	Malian	malian
+Malta	Maltese	maltese
+Mauritania	Mauritanian	mauritanian
+Mauritius	Mauritian	mauritian
+Mexico	Mexican	mexican
+Moldova	Moldovan	moldovan
+Monaco	Monegasque	Monacan	monegasque	monacan
+Mongolia	Mongolian	mongolian
+Montenegro	Montenegrin	montenegrin
+Morocco	Moroccan	moroccan
+Mozambique	Mozambican	mozambican
+Namibia	Namibian	namibian
+Nepal	Nepalese	nepalese	Nepali	nepali
+New Zealand	New Zealander	new zealander	Kiwi	kiwi
+Nicaragua	Nicaraguan	nicaraguan
+Nigeria Nigerian    nigerian
+Niger	Nigerien	nigerien
+North Korea	North Korean	north korean
+Norway	Norwegian	norwegian
+Oman	Omani	omani
+Pakistan	Pakistani	pakistani
+Palestine	Palestinian	palestinian
+Panama	Panamanian	panamanian
+Paraguay	Paraguayan	paraguayan
+Peru	Peruvian	peruvian
+Philippines	Philippine	philippine
+Poland	Polish	polish
+Portugal	Portuguese	portuguese
+Qatar	Qatari	qatari
+Romania	Romanian	romanian
+Russia	Russian	russian
+Rwanda	Rwandan	rwandan
+Saudi Arabia	Saudi Arabian	Saudi	saudi arabian	saudi
+Scotland	Scottish	scottish
+Senegal	Senegalese	senegalese
+Serbia	Serb	serb	Serbian	serbian
+Seychelles	Seychellois	seychellois
+Sierra Leone	Sierra Leonian	sierra leonian
+Singapore	Singaporean	singaporean
+Slovakia	Slovak	slovak
+Slovenia	Slovene	slovene
+Solomon Islands
+Samoa	Samoan	samoan	samoans
+Somalia	Somali	somali
+South Africa	South African	south african	south africans
+South Korea	South Korean	south korean	south koreans
+South Sudan	South Sudanese	south sudanese
+Spain	Spanish	spanish	spaniard	spaniards
+Sri Lanka	Sri Lankan	sri lankan
+Sudan	Sudanese	sudanese
+Suriname	Surinamese	surinamese
+Swaziland	Swazi	swazi
+Sweden	Swedish	swedish
+Switzerland	Swiss	swiss
+Syria	Syrian	syrian	syrians
+Taiwan	Taiwanese	taiwanese
+Tajikistan	Tajik	Tadjik	tajik	tadjik
+Tanzania	Tanzanian	tanzanian
+Thailand	Thai	thai
+Togo	Togolese	togolese
+Trinidad and Tobago	Tobago	Trinidad	trinidad	tobago
+Tunisia	Tunisian	tunisian
+Turkey	Turkish	turkish
+Turkmenistan	Turkmen	Turkoman	turkmen	turkoman
+Tuvalu	Tuvaluan	tuvaluan
+Uganda	Ugandan	ugandan
+Ukraine	Ukrainian	ukrainian
+United Arab Emirates	UAE	Emirati	U.A.E	emirati
+United States	USA	United States of America	U.S.	US	U.S.A.	American	american
+United Kingdom	UK	Britain	British	England	U.K.	british
+Uruguay	Uruguayan	uruguayan
+Uzbekistan	Uzbek	uzbek
+Vanuatu	Ni-Vanuatu	ni-vanuatu
+Venezuela	Venezuelan	venezuelan
+Vietnam	Vietnamese	vietnamese
+Wales	Welsh	welsh
+Yemen	Yemeni	yemeni	Yemenite	yemenite
+Zaire
+Zambia	Zambian	zambian
+Zimbabwe	Zimbabwean	zimbabwean

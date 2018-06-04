@@ -1,0 +1,9 @@
+force
+cooperation
+welfare
+military
+tie
+economy
+gdp
+tension
+trade
